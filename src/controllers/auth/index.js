@@ -9,6 +9,43 @@ const JWT_SECRET = "Harryisagoodb$oy";
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
+
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      return res.status(400).json({ message: "User does not exists" });
+    }
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
+
+    if (!isPasswordCorrect)
+      return res.status(400).json({ message: "Invalid credentials." });
+
+    if (existingUser.isVerified === true) {
+      const token = jwt.sign(
+        { email: existingUser.email, id: existingUser._id },
+        JWT_SECRET,
+        { expiresIn: "10h" }
+      );
+      res.status(200).json({
+        result: {
+          id: existingUser._id,
+          isVerified:existingUser.isVerified,
+          role:existingUser.role,
+        },
+        token,
+      });
+    } else {
+      res.status(401).json({ message: "invalid otp" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
 exports.signup = async (req, res) => {
   const { name, email, password, role } = req.body;
   try {
@@ -30,7 +67,7 @@ exports.signup = async (req, res) => {
       { email: result.email, id: result._id },
       JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "10h",
       }
     );
     sendEmail(email, otp);
