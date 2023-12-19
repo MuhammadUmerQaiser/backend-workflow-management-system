@@ -36,6 +36,7 @@ exports.login = async (req, res) => {
           id: existingUser._id,
           isVerified:existingUser.isVerified,
           role:existingUser.role,
+          proceed:"ok"
         },
         token,
       });
@@ -71,7 +72,7 @@ exports.signup = async (req, res) => {
       }
     );
     sendEmail(email, otp);
-    res.status(200).json({ result, authtoken });
+    res.status(200).json({ result, authtoken,proceed:"ok" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error });
