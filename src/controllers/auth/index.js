@@ -34,9 +34,9 @@ exports.login = async (req, res) => {
       res.status(200).json({
         result: {
           id: existingUser._id,
-          isVerified:existingUser.isVerified,
-          role:existingUser.role,
-          proceed:"ok"
+          isVerified: existingUser.isVerified,
+          role: existingUser.role,
+          proceed: "ok",
         },
         token,
       });
@@ -72,7 +72,18 @@ exports.signup = async (req, res) => {
       }
     );
     sendEmail(email, otp);
-    res.status(200).json({ result, authtoken,proceed:"ok" });
+    res.status(200).json({
+      result: {
+        name: name,
+        email: email,
+        role: role,
+        otp: otp,
+        isVerified: false,
+        _id:result._id
+      },
+      authtoken,
+      proceed: "ok",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error });
