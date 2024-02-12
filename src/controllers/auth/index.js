@@ -47,6 +47,7 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 exports.signup = async (req, res) => {
   const { name, email, password, role } = req.body;
   try {
@@ -79,7 +80,7 @@ exports.signup = async (req, res) => {
         role: role,
         otp: otp,
         isVerified: false,
-        _id:result._id
+        _id: result._id,
       },
       authtoken,
       proceed: "ok",
