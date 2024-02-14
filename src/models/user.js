@@ -48,5 +48,9 @@ const userSchema = mongoose.Schema({
   //   type:Boolean,
   //   default:false
   // }
+  isDeleted: {
+    type:Boolean,
+    default:false
+  }
 });
 module.exports=mongoose.model('user',userSchema);

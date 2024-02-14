@@ -35,8 +35,6 @@ exports.login = async (req, res) => {
       JWT_SECRET,
       { expiresIn: "10h" }
     );
-    console.log("Generated Token:", token);
-    console.log("admin", existingUser.role);
     res.status(200).json({
       result: {
         id: existingUser._id,
@@ -125,6 +123,7 @@ exports.EmployeeSignup = async (req, res) => {
       tasks,
       // otp: otp,
       // isVerified: false,
+      isDeleted: false,
     });
     const authtoken = jwt.sign(
       { email: result.email, id: result._id },
@@ -134,14 +133,7 @@ exports.EmployeeSignup = async (req, res) => {
       }
     );
     res.status(200).json({
-      result: {
-        name: name,
-        email: email,
-        role: result.role,
-        // otp: otp,
-        // isVerified: false,
-        _id: result._id,
-      },
+      data: result,
       authtoken,
     });
   } catch (error) {
@@ -152,14 +144,101 @@ exports.EmployeeSignup = async (req, res) => {
 
 exports.getAllEmployees = async (req, res) => {
   try {
-    const employee = await User.find();
-    const filteredEmployees = employee.filter(
-      (employee) => employee._id.toString() !== req.userId
-    );
-    res.status(200).json(filteredEmployees);
+    const employees = await User.find({
+      _id: { $ne: req.userId },
+      isDeleted: false,
+    });
+
+    res.status(200).json(employees);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+exports.getEmployeeById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const employee = await User.findById(id);
+
+    if (!employee || employee.isDeleted===true) {
+      return res.status(400).json({ message: "User does not exist" });
+    }
+
+    const { password, ...filteredEmployeeData } = employee.toObject();
+
+    res.status(200).json(filteredEmployeeData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred" });
+  }
+};
+
+exports.updateEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      name,
+      email,
+      role,
+      domain,
+      designation,
+      member,
+      team,
+      grade,
+      tasks,
+    } = req.body;
+
+    const existingUser = await User.findById(id);
+
+    if (!existingUser) {
+      return res.status(404).json({ message: "No user found with this id" });
+    }
+
+    // Check if the user is deleted before allowing updates
+    if (existingUser.isDeleted===true) {
+      return res.status(400).json({ message: "Invalid operation. User is deleted." });
+    }
+
+    existingUser.name = name || existingUser.name;
+    existingUser.email = email || existingUser.email;
+    existingUser.role = role || existingUser.role;
+    existingUser.domain = domain || existingUser.domain;
+    existingUser.designation = designation || existingUser.designation;
+    existingUser.member = member || existingUser.member;
+    existingUser.team = team || existingUser.team;
+    existingUser.grade = grade || existingUser.grade;
+    existingUser.tasks = tasks || existingUser.tasks;
+
+    const updatedUser = await existingUser.save();
+
+    const { password, ...filteredUserData } = updatedUser.toObject();
+
+    res.status(200).json(filteredUserData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+exports.deleteEmployee = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found with this id" });
+    }
+    console.log("del",user.isDeleted)
+    if (user.isDeleted === true) {
+      return res.status(400).json({ message: "User already deleted" });
+    }
+    user.isDeleted = true;
+
+    res.json({ message: "User deleted successfully", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred" });
   }
 };
 
