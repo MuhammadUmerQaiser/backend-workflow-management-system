@@ -15,6 +15,31 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  domain: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  designation: {
+    type: String,
+    required: true,
+  },
+  member: {
+    type: String,
+    required: true,
+  },
+  grade: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  team: {
+    type: String,
+  },
+  tasks: {
+    type: Array,
+    required: true,
+  },
   // otp:{
   //   type:String,
   //   default : null

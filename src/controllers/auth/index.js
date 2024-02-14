@@ -27,12 +27,16 @@ exports.login = async (req, res) => {
 
     // if (existingUser.isVerified === true) {
     const token = jwt.sign(
-      { email: existingUser.email, id: existingUser._id,role:existingUser.role },
+      {
+        email: existingUser.email,
+        id: existingUser._id,
+        role: existingUser.role,
+      },
       JWT_SECRET,
       { expiresIn: "10h" }
     );
-    console.log('Generated Token:', token);
-    console.log("admin",existingUser.role)
+    console.log("Generated Token:", token);
+    console.log("admin", existingUser.role);
     res.status(200).json({
       result: {
         id: existingUser._id,
@@ -66,7 +70,7 @@ exports.AdminSignup = async (req, res) => {
       // isVerified: false,
     });
     const authtoken = jwt.sign(
-      { email: result.email, id: result._id,role:result.role },
+      { email: result.email, id: result._id, role: result.role },
       JWT_SECRET,
       {
         expiresIn: "10h",
@@ -91,8 +95,17 @@ exports.AdminSignup = async (req, res) => {
 };
 
 exports.EmployeeSignup = async (req, res) => {
-  
-  const { name, email, password } = req.body;
+  const {
+    name,
+    email,
+    password,
+    domain,
+    designation,
+    member,
+    team,
+    grade,
+    tasks,
+  } = req.body;
   try {
     existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -104,6 +117,12 @@ exports.EmployeeSignup = async (req, res) => {
       email,
       password: hashedPassword,
       role: "Employee",
+      domain,
+      designation,
+      member,
+      team,
+      grade,
+      tasks,
       // otp: otp,
       // isVerified: false,
     });
@@ -134,14 +153,15 @@ exports.EmployeeSignup = async (req, res) => {
 exports.getAllEmployees = async (req, res) => {
   try {
     const employee = await User.find();
-    const filteredEmployees = employee.filter(employee => employee._id.toString() !== req.userId);
+    const filteredEmployees = employee.filter(
+      (employee) => employee._id.toString() !== req.userId
+    );
     res.status(200).json(filteredEmployees);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error });
   }
 };
-
 
 // exports.verifyOtp = async (req, res) => {
 //   const { otp } = req.body;
