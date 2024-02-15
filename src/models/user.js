@@ -18,7 +18,6 @@ const userSchema = mongoose.Schema({
   domain: {
     type: String,
     required: true,
-    unique: true,
   },
   designation: {
     type: String,
@@ -31,7 +30,6 @@ const userSchema = mongoose.Schema({
   grade: {
     type: String,
     required: true,
-    unique: true,
   },
   team: {
     type: String,

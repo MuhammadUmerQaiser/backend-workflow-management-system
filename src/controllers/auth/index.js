@@ -144,12 +144,29 @@ exports.EmployeeSignup = async (req, res) => {
 
 exports.getAllEmployees = async (req, res) => {
   try {
-    const employees = await User.find({
-      _id: { $ne: req.userId },
-      isDeleted: false,
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const totalUsers = await User.countDocuments({
+      role: { $ne: "Admin" },
     });
 
-    res.status(200).json(employees);
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    const employees = await User.find({
+      role: { $ne: "Admin" },
+      _id: { $ne: req.userId },
+      isDeleted: false,
+    })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.status(200).json({
+      data: employees,
+      currentPage: page,
+      totalPages: totalPages,
+      pageSize: limit,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -161,7 +178,7 @@ exports.getEmployeeById = async (req, res) => {
   try {
     const employee = await User.findById(id);
 
-    if (!employee || employee.isDeleted===true) {
+    if (!employee || employee.isDeleted === true) {
       return res.status(400).json({ message: "User does not exist" });
     }
 
@@ -196,8 +213,10 @@ exports.updateEmployee = async (req, res) => {
     }
 
     // Check if the user is deleted before allowing updates
-    if (existingUser.isDeleted===true) {
-      return res.status(400).json({ message: "Invalid operation. User is deleted." });
+    if (existingUser.isDeleted === true) {
+      return res
+        .status(400)
+        .json({ message: "Invalid operation. User is deleted." });
     }
 
     existingUser.name = name || existingUser.name;
@@ -206,7 +225,7 @@ exports.updateEmployee = async (req, res) => {
     existingUser.domain = domain || existingUser.domain;
     existingUser.designation = designation || existingUser.designation;
     existingUser.member = member || existingUser.member;
-    existingUser.team = team || existingUser.team;
+    existingUser.team = member == "group" ? team || existingUser.team : "";
     existingUser.grade = grade || existingUser.grade;
     existingUser.tasks = tasks || existingUser.tasks;
 
@@ -221,7 +240,6 @@ exports.updateEmployee = async (req, res) => {
   }
 };
 
-
 exports.deleteEmployee = async (req, res) => {
   const { id } = req.params;
   try {
@@ -229,12 +247,12 @@ exports.deleteEmployee = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found with this id" });
     }
-    console.log("del",user.isDeleted)
+    console.log("del", user.isDeleted);
     if (user.isDeleted === true) {
       return res.status(400).json({ message: "User already deleted" });
     }
     user.isDeleted = true;
-
+    user.save();
     res.json({ message: "User deleted successfully", user });
   } catch (error) {
     console.error(error);
