@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
+const seeders = require("./seeders/index");
 
 const MongoURI = process.env.MONGODB_URI;
 
@@ -13,6 +14,7 @@ const connectToMongo = () => {
   });
 
   db.once("open", () => {
+    seeders();
     console.log("Connected to MongoDB");
   });
 };
