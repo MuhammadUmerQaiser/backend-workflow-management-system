@@ -1,4 +1,5 @@
-const authRoutes = require("./routes/user")
+const authRoutes = require("./routes/auth")
+const adminRoutes = require("./routes/admin")
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -23,7 +24,8 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json());
-app.use("/auth",authRoutes)
+app.use("/api",authRoutes)
+app.use("/api",adminRoutes)
 
 
 app.listen(port, () => {
