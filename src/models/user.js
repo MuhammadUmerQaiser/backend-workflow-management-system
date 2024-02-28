@@ -15,6 +15,29 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  domain: {
+    type: String,
+    required: true,
+  },
+  designation: {
+    type: String,
+    required: true,
+  },
+  member: {
+    type: String,
+    required: true,
+  },
+  grade: {
+    type: String,
+    required: true,
+  },
+  team: {
+    type: String,
+  },
+  tasks: {
+    type: Array,
+    required: true,
+  },
   // otp:{
   //   type:String,
   //   default : null
@@ -23,5 +46,9 @@ const userSchema = mongoose.Schema({
   //   type:Boolean,
   //   default:false
   // }
+  isDeleted: {
+    type:Boolean,
+    default:false
+  }
 });
 module.exports=mongoose.model('user',userSchema);
