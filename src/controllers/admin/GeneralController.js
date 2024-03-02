@@ -2,7 +2,10 @@ const express = require("express");
 const roleModel = require("../../models/role");
 const domainModel = require("../../models/domain");
 const designationModel = require("../../models/designation");
+const taskModel = require("../../models/task")
+const gradeModel = require("../../models/grade")
 const entityController = require("../../utils/entityController");
+
 exports.createRole = async (req, res) => {
   await entityController.createEntity(roleModel, "Role", false, req, res);
 };
@@ -68,4 +71,38 @@ exports.updateDesignation = async (req, res) => {
     req,
     res
   );
+};
+
+//tasks
+exports.createTask = async (req, res) => {
+  await entityController.createEntity(taskModel, "Task", false, req, res);
+};
+
+exports.getAllTasks = async (req, res) => {
+  await entityController.getAllEntities(taskModel, false, req, res);
+};
+
+exports.deleteTask = async (req, res) => {
+  await entityController.deleteEntity(taskModel, "Task", req, res);
+};
+
+exports.updateTask = async (req, res) => {
+  await entityController.updateEntity(taskModel, "Task", false, req, res);
+};
+
+//grade
+exports.createGrade = async (req, res) => {
+  await entityController.createEntity(gradeModel, "Grade", false, req, res);
+};
+
+exports.getAllGrades = async (req, res) => {
+  await entityController.getAllEntities(gradeModel, false, req, res);
+};
+
+exports.deleteGrade = async (req, res) => {
+  await entityController.deleteEntity(gradeModel, "Grade", req, res);
+};
+
+exports.updateGrade = async (req, res) => {
+  await entityController.updateEntity(gradeModel, "Grade", false, req, res);
 };
