@@ -49,7 +49,17 @@ exports.login = async (req, res) => {
   }
 };
 exports.AdminSignup = async (req, res) => {
-  const { name, email, password } = req.body;
+  const {
+    name,
+    email,
+    password,
+    domain,
+    designation,
+    member,
+    grade,
+    team,
+    tasks,
+  } = req.body;
   try {
     existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -62,6 +72,12 @@ exports.AdminSignup = async (req, res) => {
       email,
       password: hashedPassword,
       role: "Admin",
+      domain,
+      designation,
+      member,
+      grade,
+      team,
+      tasks,
       // otp: otp,
       // isVerified: false,
     });
