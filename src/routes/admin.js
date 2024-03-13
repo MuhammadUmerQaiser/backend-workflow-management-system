@@ -26,7 +26,11 @@ const {
   createGrade,
   getAllGrades,
   deleteGrade,
-  updateGrade
+  updateGrade,
+  createTeam,
+  getAllTeams,
+  deleteTeam,
+  updateTeam
 } = require("../controllers/admin/GeneralController");
 const AdminAuth = require("../middleware/AdminAuth");
 const router = express.Router();
@@ -66,5 +70,11 @@ router.post("/create-grade", AdminAuth, createGrade);
 router.get("/get-all-grades", AdminAuth, getAllGrades);
 router.delete("/delete-grade/:id", AdminAuth, deleteGrade);
 router.put("/update-grade/:id", AdminAuth, updateGrade);
+
+//team
+router.post("/create-team", AdminAuth, createTeam);
+router.get("/get-all-teams", AdminAuth, getAllTeams);
+router.delete("/delete-team/:id", AdminAuth, deleteTeam);
+router.put("/update-team/:id", AdminAuth, updateTeam);
 
 module.exports = router;

@@ -3,6 +3,7 @@ const roleModel = require("../../models/role");
 const domainModel = require("../../models/domain");
 const designationModel = require("../../models/designation");
 const taskModel = require("../../models/task")
+const teamModel = require("../../models/team")
 const gradeModel = require("../../models/grade")
 const entityController = require("../../utils/entityController");
 
@@ -105,4 +106,21 @@ exports.deleteGrade = async (req, res) => {
 
 exports.updateGrade = async (req, res) => {
   await entityController.updateEntity(gradeModel, "Grade", false, req, res);
+};
+
+//team
+exports.createTeam = async (req, res) => {
+  await entityController.createEntity(teamModel, "Team", false, req, res);
+};
+
+exports.getAllTeams = async (req, res) => {
+  await entityController.getAllEntities(teamModel, false, req, res);
+};
+
+exports.deleteTeam = async (req, res) => {
+  await entityController.deleteEntity(teamModel, "Team", req, res);
+};
+
+exports.updateTeam = async (req, res) => {
+  await entityController.updateEntity(teamModel, "Team", false, req, res);
 };
