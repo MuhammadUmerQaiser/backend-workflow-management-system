@@ -1,6 +1,6 @@
 const createEntity = async (model, entityName, isActiveAvailable, req, res) => {
   try {
-    const { name } = req.body;
+    const { name, isActive } = req.body;
 
     const existingEntity = await model.findOne({ name: name });
     if (!existingEntity) {
@@ -8,7 +8,11 @@ const createEntity = async (model, entityName, isActiveAvailable, req, res) => {
         name: name,
       };
 
-      if (isActiveAvailable) {
+      if(entityName == 'Team'){
+        entityData.member = req.body.member;
+        entityData.membersList = req.body.membersList;
+      }
+      if (isActive) {
         entityData.isActive = true;
       }
 
@@ -78,6 +82,11 @@ const updateEntity = async (model, entityName, isActiveAvailable, req, res) => {
     }
 
     entityExists.name = name || entityExists.name;
+
+    if(entityName == 'Team'){
+      entityExists.member = req.body.member  || entityExists.member;
+      entityExists.membersList = req.body.membersList  || entityExists.membersList;
+    }
 
     if (isActiveAvailable) {
       if (isActive !== undefined) {
