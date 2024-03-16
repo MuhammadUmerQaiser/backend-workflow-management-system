@@ -30,9 +30,9 @@ const {
   createTeam,
   getAllTeams,
   deleteTeam,
-  updateTeam
+  updateTeam,
 } = require("../controllers/admin/GeneralController");
-const AdminAuth = require("../middleware/AdminAuth");
+const { AdminAuth } = require("../middleware/authentication");
 const router = express.Router();
 
 router.post("/employee-signup", AdminAuth, EmployeeSignup);
