@@ -50,7 +50,7 @@ const getAllEntities = async (model, isActiveAvailable, req, res) => {
 
     query = query.sort({ createdAt: -1 });
 
-    if (paginatedData) {
+    if (paginatedData == 'true') {
       query = query.skip((page - 1) * limit).limit(limit);
     }
 
