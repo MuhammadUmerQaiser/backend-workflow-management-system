@@ -1,4 +1,5 @@
 const authRoutes = require("./routes/auth")
+const userRoutes = require("./routes/user")
 const adminRoutes = require("./routes/admin")
 const express = require('express');
 const cors = require('cors');
@@ -26,6 +27,7 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use("/api",authRoutes)
 app.use("/api",adminRoutes)
+app.use("/api",userRoutes)
 
 
 app.listen(port, () => {

@@ -30,9 +30,10 @@ const {
   createTeam,
   getAllTeams,
   deleteTeam,
-  updateTeam
+  updateTeam,
 } = require("../controllers/admin/GeneralController");
-const AdminAuth = require("../middleware/AdminAuth");
+const { AdminAuth } = require("../middleware/authentication");
+const { getAllUserWorkflowHistory } = require("../controllers/admin/WorkflowController");
 const router = express.Router();
 
 router.post("/employee-signup", AdminAuth, EmployeeSignup);
@@ -76,5 +77,8 @@ router.post("/create-team", AdminAuth, createTeam);
 router.get("/get-all-teams", AdminAuth, getAllTeams);
 router.delete("/delete-team/:id", AdminAuth, deleteTeam);
 router.put("/update-team/:id", AdminAuth, updateTeam);
+
+
+router.get("/get-all-user-workflow-history", AdminAuth, getAllUserWorkflowHistory);
 
 module.exports = router;
