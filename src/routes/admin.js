@@ -33,7 +33,19 @@ const {
   updateTeam,
 } = require("../controllers/admin/GeneralController");
 const { AdminAuth } = require("../middleware/authentication");
-const { getAllUserWorkflowHistory } = require("../controllers/admin/WorkflowController");
+const {
+  getAllUserWorkflowHistory,
+} = require("../controllers/admin/WorkflowController");
+const {
+  createCategory,
+  getAllCategries,
+  deleteCategory,
+  updateCategory,
+  createSubCategory,
+  getAllSubCategries,
+  deleteSubCategory,
+  updateSubCategory,
+} = require("../controllers/admin/CategoryController");
 const router = express.Router();
 
 router.post("/employee-signup", AdminAuth, EmployeeSignup);
@@ -78,7 +90,22 @@ router.get("/get-all-teams", AdminAuth, getAllTeams);
 router.delete("/delete-team/:id", AdminAuth, deleteTeam);
 router.put("/update-team/:id", AdminAuth, updateTeam);
 
+//category
+router.post("/create-category", AdminAuth, createCategory);
+router.get("/get-all-categories", AdminAuth, getAllCategries);
+router.delete("/delete-category/:id", AdminAuth, deleteCategory);
+router.put("/update-category/:id", AdminAuth, updateCategory);
 
-router.get("/get-all-user-workflow-history", AdminAuth, getAllUserWorkflowHistory);
+//sub-category
+router.post("/create-sub-category", AdminAuth, createSubCategory);
+router.get("/get-all-categories", AdminAuth, getAllSubCategries);
+router.delete("/delete-sub-category/:id", AdminAuth, deleteSubCategory);
+router.put("/update-sub-category/:id", AdminAuth, updateSubCategory);
+
+router.get(
+  "/get-all-user-workflow-history",
+  AdminAuth,
+  getAllUserWorkflowHistory
+);
 
 module.exports = router;

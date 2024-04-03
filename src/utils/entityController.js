@@ -31,7 +31,7 @@ const createEntity = async (model, entityName, isActiveAvailable, req, res) => {
   }
 };
 
-const getAllEntities = async (model, isActiveAvailable, req, res) => {
+const getAllEntities = async (model, isActiveAvailable, req, res, populate = null) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -42,6 +42,10 @@ const getAllEntities = async (model, isActiveAvailable, req, res) => {
     if (isActiveAvailable) {
       const isActive = req.query.isActive === "true";
       query = isActive ? query.where({ isActive: true }) : query;
+    }
+
+    if(populate){
+      query = query.populate(populate);
     }
 
     const totalEntities = await model.countDocuments(query._conditions);
