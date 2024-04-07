@@ -1,5 +1,7 @@
 const express = require("express");
 const User = require("../../models/user");
+const taxPayerModel = require("../../models/tax-payer");
+const entityController = require("../../utils/entityController");
 const bcrypt = require("bcryptjs");
 var jwt = require("jsonwebtoken");
 
@@ -169,5 +171,68 @@ exports.deleteEmployee = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred" });
+  }
+};
+
+exports.createTaxPayer = async (req, res) => {
+  try {
+    const { name, category, sub_category } = req.body;
+    const taxPayer = new taxPayerModel({ name, category, sub_category });
+    await taxPayer.save();
+
+    res.status(200).json({
+      message: `Tax Payer created successfully`,
+      data: taxPayer,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getAllTaxPayers = async (req, res) => {
+  try {
+    await entityController.getAllEntities(
+      taxPayerModel,
+      false,
+      req,
+      res,
+      "category,sub_category"
+    );
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.deleteTaxPayer = async (req, res) => {
+  try {
+    await entityController.deleteEntity(taxPayerModel, "Tax Payer", req, res);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateTaxPayer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, category, sub_category } = req.body;
+
+    const existingTaxPayer = await taxPayerModel.findById(id);
+    if (!existingTaxPayer) {
+      return res
+        .status(404)
+        .json({ message: `Tax Payer with that id does not exist` });
+    }
+    existingTaxPayer.name = name || existingTaxPayer.name;
+    existingTaxPayer.category = category || existingTaxPayer.category;
+    existingTaxPayer.sub_category =
+      sub_category || existingTaxPayer.sub_category;
+    await existingTaxPayer.save();
+
+    res.status(200).json({
+      message: `Tax Payer updated successfully`,
+      data: existingTaxPayer,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

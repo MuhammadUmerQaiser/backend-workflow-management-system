@@ -8,7 +8,7 @@ const createEntity = async (model, entityName, isActiveAvailable, req, res) => {
         name: name,
       };
 
-      if(entityName == 'Team'){
+      if (entityName == "Team") {
         entityData.member = req.body.member;
         entityData.membersList = req.body.membersList;
       }
@@ -31,7 +31,13 @@ const createEntity = async (model, entityName, isActiveAvailable, req, res) => {
   }
 };
 
-const getAllEntities = async (model, isActiveAvailable, req, res, populate = null) => {
+const getAllEntities = async (
+  model,
+  isActiveAvailable,
+  req,
+  res,
+  populate = null
+) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -43,9 +49,19 @@ const getAllEntities = async (model, isActiveAvailable, req, res, populate = nul
       const isActive = req.query.isActive === "true";
       query = isActive ? query.where({ isActive: true }) : query;
     }
+    if (req.query.category != 'null' && req.query.category != undefined) {
+      query = query.where({category: req.query.category});
+    }
 
-    if(populate){
-      query = query.populate(populate);
+    if (populate) {
+      const fieldsToPopulate = populate.split(',');
+      if(fieldsToPopulate){
+        fieldsToPopulate.forEach(item => {
+          query = query.populate(item.trim())
+        });
+      }else{
+        query = query.populate(populate);
+      }
     }
 
     const totalEntities = await model.countDocuments(query._conditions);
@@ -54,7 +70,7 @@ const getAllEntities = async (model, isActiveAvailable, req, res, populate = nul
 
     query = query.sort({ createdAt: -1 });
 
-    if (paginatedData == 'true') {
+    if (paginatedData == "true") {
       query = query.skip((page - 1) * limit).limit(limit);
     }
 
@@ -87,9 +103,10 @@ const updateEntity = async (model, entityName, isActiveAvailable, req, res) => {
 
     entityExists.name = name || entityExists.name;
 
-    if(entityName == 'Team'){
-      entityExists.member = req.body.member  || entityExists.member;
-      entityExists.membersList = req.body.membersList  || entityExists.membersList;
+    if (entityName == "Team") {
+      entityExists.member = req.body.member || entityExists.member;
+      entityExists.membersList =
+        req.body.membersList || entityExists.membersList;
     }
 
     if (isActiveAvailable) {

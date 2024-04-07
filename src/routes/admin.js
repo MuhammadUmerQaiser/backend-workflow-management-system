@@ -5,6 +5,10 @@ const {
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
+  createTaxPayer,
+  updateTaxPayer,
+  getAllTaxPayers,
+  deleteTaxPayer
 } = require("../controllers/admin/AdminController");
 const {
   createRole,
@@ -98,9 +102,15 @@ router.put("/update-category/:id", AdminAuth, updateCategory);
 
 //sub-category
 router.post("/create-sub-category", AdminAuth, createSubCategory);
-router.get("/get-all-categories", AdminAuth, getAllSubCategries);
+router.get("/get-all-sub-categories", AdminAuth, getAllSubCategries);
 router.delete("/delete-sub-category/:id", AdminAuth, deleteSubCategory);
 router.put("/update-sub-category/:id", AdminAuth, updateSubCategory);
+
+//tax-payer
+router.post("/create-tax-payer", AdminAuth, createTaxPayer);
+router.get("/get-all-tax-payers", AdminAuth, getAllTaxPayers);
+router.delete("/delete-tax-payer/:id", AdminAuth, deleteTaxPayer);
+router.put("/update-tax-payer/:id", AdminAuth, updateTaxPayer);
 
 router.get(
   "/get-all-user-workflow-history",
