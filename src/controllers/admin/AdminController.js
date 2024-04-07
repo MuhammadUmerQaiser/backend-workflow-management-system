@@ -13,10 +13,10 @@ exports.EmployeeSignup = async (req, res) => {
     domain,
     designation,
     role,
-    member,
-    team,
-    grade,
-    tasks,
+    // member,
+    // team,
+    // grade,
+    // tasks,
   } = req.body;
   try {
     existingUser = await User.findOne({ email });
@@ -31,10 +31,10 @@ exports.EmployeeSignup = async (req, res) => {
       role: role,
       domain,
       designation,
-      member,
-      team,
-      grade,
-      tasks,
+      // member,
+      // team,
+      // grade,
+      // tasks,
       // otp: otp,
       // isVerified: false,
       isDeleted: false,
@@ -114,10 +114,10 @@ exports.updateEmployee = async (req, res) => {
       role,
       domain,
       designation,
-      member,
-      team,
-      grade,
-      tasks,
+      // member,
+      // team,
+      // grade,
+      // tasks,
     } = req.body;
 
     const existingUser = await User.findById(id);
@@ -138,10 +138,10 @@ exports.updateEmployee = async (req, res) => {
     existingUser.role = role || existingUser.role;
     existingUser.domain = domain || existingUser.domain;
     existingUser.designation = designation || existingUser.designation;
-    existingUser.member = member || existingUser.member;
-    existingUser.team = member == "group" ? team || existingUser.team : "";
-    existingUser.grade = grade || existingUser.grade;
-    existingUser.tasks = tasks || existingUser.tasks;
+    // existingUser.member = member || existingUser.member;
+    // existingUser.team = member == "group" ? team || existingUser.team : "";
+    // existingUser.grade = grade || existingUser.grade;
+    // existingUser.tasks = tasks || existingUser.tasks;
 
     const updatedUser = await existingUser.save();
 

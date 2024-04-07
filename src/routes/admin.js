@@ -76,23 +76,23 @@ router.get("/get-all-designations", AdminAuth, getAllDesignations);
 router.delete("/delete-designation/:id", AdminAuth, deleteDesignation);
 router.put("/update-designation/:id", AdminAuth, updateDesignation);
 
-//tasks
-router.post("/create-task", AdminAuth, createTask);
-router.get("/get-all-tasks", AdminAuth, getAllTasks);
-router.delete("/delete-task/:id", AdminAuth, deleteTask);
-router.put("/update-task/:id", AdminAuth, updateTask);
+// //tasks
+// router.post("/create-task", AdminAuth, createTask);
+// router.get("/get-all-tasks", AdminAuth, getAllTasks);
+// router.delete("/delete-task/:id", AdminAuth, deleteTask);
+// router.put("/update-task/:id", AdminAuth, updateTask);
 
-//grade
-router.post("/create-grade", AdminAuth, createGrade);
-router.get("/get-all-grades", AdminAuth, getAllGrades);
-router.delete("/delete-grade/:id", AdminAuth, deleteGrade);
-router.put("/update-grade/:id", AdminAuth, updateGrade);
+// //grade
+// router.post("/create-grade", AdminAuth, createGrade);
+// router.get("/get-all-grades", AdminAuth, getAllGrades);
+// router.delete("/delete-grade/:id", AdminAuth, deleteGrade);
+// router.put("/update-grade/:id", AdminAuth, updateGrade);
 
-//team
-router.post("/create-team", AdminAuth, createTeam);
-router.get("/get-all-teams", AdminAuth, getAllTeams);
-router.delete("/delete-team/:id", AdminAuth, deleteTeam);
-router.put("/update-team/:id", AdminAuth, updateTeam);
+// //team
+// router.post("/create-team", AdminAuth, createTeam);
+// router.get("/get-all-teams", AdminAuth, getAllTeams);
+// router.delete("/delete-team/:id", AdminAuth, deleteTeam);
+// router.put("/update-team/:id", AdminAuth, updateTeam);
 
 //category
 router.post("/create-category", AdminAuth, createCategory);
