@@ -77,7 +77,13 @@ exports.createSubCategory = async (req, res) => {
 
 exports.getAllSubCategries = async (req, res) => {
   try {
-    await entityController.getAllEntities(subCategoryModel, false, req, res, 'category');
+    await entityController.getAllEntities(
+      subCategoryModel,
+      false,
+      req,
+      res,
+      "category"
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -85,7 +91,12 @@ exports.getAllSubCategries = async (req, res) => {
 
 exports.deleteSubCategory = async (req, res) => {
   try {
-    await entityController.deleteEntity(subCategoryModel, "Sub Category", req, res);
+    await entityController.deleteEntity(
+      subCategoryModel,
+      "Sub Category",
+      req,
+      res
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -112,6 +123,30 @@ exports.updateSubCategory = async (req, res) => {
       message: `Sub Cateogry updated successfully`,
       data: existingSubCategory,
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getSubCategoriesBasedOnMultipleCategories = async (req, res) => {
+  try {
+    const { categories } = req.query;
+    const categoryIds = categories.split(",");
+    if (categories) {
+      const subCategories = await subCategoryModel
+        .find({
+          category: { $in: categoryIds },
+        })
+        .populate("category");
+
+      res.status(200).json({
+        data: subCategories,
+      });
+    } else {
+      res.status(200).json({
+        data: [],
+      });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

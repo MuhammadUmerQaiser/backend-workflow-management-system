@@ -236,3 +236,33 @@ exports.updateTaxPayer = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getTaxPayersBasedOnMultipleCategoriesAndSubCategories = async (
+  req,
+  res
+) => {
+  try {
+    const { categories, subCategories } = req.query;
+    const categoryIds = categories.split(",");
+    const subCategoryIds = subCategories.split(",");
+    if (categories && subCategories) {
+      const taxPayers = await taxPayerModel
+        .find({
+          sub_category: { $in: subCategoryIds },
+          occupied: 0
+        })
+        .populate("category")
+        .populate('sub_category');
+
+      res.status(200).json({
+        data: taxPayers,
+      });
+    } else {
+      res.status(200).json({
+        data: [],
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

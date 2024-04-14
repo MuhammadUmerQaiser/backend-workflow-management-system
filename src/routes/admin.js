@@ -8,7 +8,8 @@ const {
   createTaxPayer,
   updateTaxPayer,
   getAllTaxPayers,
-  deleteTaxPayer
+  deleteTaxPayer,
+  getTaxPayersBasedOnMultipleCategoriesAndSubCategories,
 } = require("../controllers/admin/AdminController");
 const {
   createRole,
@@ -23,18 +24,6 @@ const {
   getAllDesignations,
   deleteDesignation,
   updateDesignation,
-  createTask,
-  getAllTasks,
-  deleteTask,
-  updateTask,
-  createGrade,
-  getAllGrades,
-  deleteGrade,
-  updateGrade,
-  createTeam,
-  getAllTeams,
-  deleteTeam,
-  updateTeam,
 } = require("../controllers/admin/GeneralController");
 const { AdminAuth } = require("../middleware/authentication");
 const {
@@ -49,7 +38,12 @@ const {
   getAllSubCategries,
   deleteSubCategory,
   updateSubCategory,
+  getSubCategoriesBasedOnMultipleCategories,
 } = require("../controllers/admin/CategoryController");
+const {
+  createWorkingGroup,
+  getAllWorkingGroups,
+} = require("../controllers/admin/WorkingGroupController");
 const router = express.Router();
 
 router.post("/employee-signup", AdminAuth, EmployeeSignup);
@@ -106,11 +100,27 @@ router.get("/get-all-sub-categories", AdminAuth, getAllSubCategries);
 router.delete("/delete-sub-category/:id", AdminAuth, deleteSubCategory);
 router.put("/update-sub-category/:id", AdminAuth, updateSubCategory);
 
+router.get(
+  "/get-sub-categories-by-multiple-categories",
+  AdminAuth,
+  getSubCategoriesBasedOnMultipleCategories
+);
+
 //tax-payer
 router.post("/create-tax-payer", AdminAuth, createTaxPayer);
 router.get("/get-all-tax-payers", AdminAuth, getAllTaxPayers);
 router.delete("/delete-tax-payer/:id", AdminAuth, deleteTaxPayer);
 router.put("/update-tax-payer/:id", AdminAuth, updateTaxPayer);
+
+router.get(
+  "/get-tax-payers-by-multiple-categories-&-sub-categories",
+  AdminAuth,
+  getTaxPayersBasedOnMultipleCategoriesAndSubCategories
+);
+
+//working-group
+router.post("/create-working-group", AdminAuth, createWorkingGroup);
+router.get("/get-all-working-groups", AdminAuth, getAllWorkingGroups);
 
 router.get(
   "/get-all-user-workflow-history",
