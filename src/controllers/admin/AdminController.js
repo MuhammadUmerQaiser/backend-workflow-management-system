@@ -249,10 +249,10 @@ exports.getTaxPayersBasedOnMultipleCategoriesAndSubCategories = async (
       const taxPayers = await taxPayerModel
         .find({
           sub_category: { $in: subCategoryIds },
-          occupied: 0
+          occupied: 0,
         })
         .populate("category")
-        .populate('sub_category');
+        .populate("sub_category");
 
       res.status(200).json({
         data: taxPayers,
@@ -264,5 +264,21 @@ exports.getTaxPayersBasedOnMultipleCategoriesAndSubCategories = async (
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getAllUnAssociatedEmployees = async (req, res) => {
+  try {
+    const employees = await User.find({
+      associated: null,
+      role: { $ne: "Admin" },
+    });
+
+    res.status(200).json({
+      data: employees,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };

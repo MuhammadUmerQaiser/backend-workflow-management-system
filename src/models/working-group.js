@@ -25,6 +25,11 @@ const workingGroupSchema = mongoose.Schema(
         required: true,
       },
     ],
+    associated: {
+      type: ObjectId,
+      ref: "desk",
+      default: null,
+    },
   },
   { timestamps: true }
 );

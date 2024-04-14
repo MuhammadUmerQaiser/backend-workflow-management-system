@@ -10,6 +10,7 @@ const {
   getAllTaxPayers,
   deleteTaxPayer,
   getTaxPayersBasedOnMultipleCategoriesAndSubCategories,
+  getAllUnAssociatedEmployees
 } = require("../controllers/admin/AdminController");
 const {
   createRole,
@@ -43,7 +44,12 @@ const {
 const {
   createWorkingGroup,
   getAllWorkingGroups,
+  getAllUnAssociatedWorkingGroups
 } = require("../controllers/admin/WorkingGroupController");
+const {
+  createDesk,
+  getAllDesks
+} = require("../controllers/admin/DeskController");
 const router = express.Router();
 
 router.post("/employee-signup", AdminAuth, EmployeeSignup);
@@ -122,6 +128,13 @@ router.get(
 router.post("/create-working-group", AdminAuth, createWorkingGroup);
 router.get("/get-all-working-groups", AdminAuth, getAllWorkingGroups);
 
+//desk
+router.post("/create-desk", AdminAuth, createDesk);
+router.get("/get-all-desks", AdminAuth, getAllDesks);
+
+
+router.get('/get-all-unassoicated-employees', AdminAuth, getAllUnAssociatedEmployees);
+router.get('/get-all-unassoicated-working-groups', AdminAuth, getAllUnAssociatedWorkingGroups);
 router.get(
   "/get-all-user-workflow-history",
   AdminAuth,

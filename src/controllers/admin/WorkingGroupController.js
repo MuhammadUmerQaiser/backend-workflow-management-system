@@ -61,3 +61,18 @@ exports.getAllWorkingGroups = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+exports.getAllUnAssociatedWorkingGroups = async (req, res) => {
+  try {
+    const groups = await workingGroupModel.find({
+      associated: null,
+    });
+
+    res.status(200).json({
+      data: groups,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
