@@ -18,11 +18,13 @@ const userSchema = mongoose.Schema(
     },
     domain: {
       type: String,
-      required: true,
+      default: null,
+      // required: true,
     },
     designation: {
       type: String,
-      required: true,
+      // required: true,
+      default: null,
     },
     associated: {
       type: ObjectId,
