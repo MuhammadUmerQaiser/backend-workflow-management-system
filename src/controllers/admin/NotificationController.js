@@ -51,18 +51,37 @@ exports.getNotificationById = async (req, res) => {
 
     const notification = await notificationModel
       .findById(id)
-      .populate('information.employeeId','-password')
-      .populate('information.deskId');
+      .populate("information.employeeId", "-password")
+      .populate("information.deskId");
 
     if (!notification) {
-      return res.status(404).json({ message: 'Notification not found' });
+      return res.status(404).json({ message: "Notification not found" });
     }
 
     res.status(200).json({
-      message: 'Notification retrieved successfully',
+      message: "Notification retrieved successfully",
       data: notification,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+exports.deleteNotification = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedNotification = await notificationModel.findByIdAndDelete(id);
+
+    if (!deletedNotification) {
+      return res.status(404).json({ message: "Notification not found" });
+    }
+
+    res.status(200).json({
+      message: "Notification deleted successfully",
+      data: deletedNotification,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

@@ -52,7 +52,8 @@ const {
 } = require("../controllers/admin/DeskController");
 const {
   createNotification,
-  getNotification,getNotificationById
+  getNotification,getNotificationById,
+  deleteNotification,
 } = require("../controllers/admin/NotificationController")
 const router = express.Router();
 
@@ -149,4 +150,6 @@ router.get(
 router.post("/create-notification",AdminAuth,createNotification)
 router.get("/get-notification",AdminAuth,getNotification)
 router.get('/get-notification/:id',AdminAuth,getNotificationById)
+router.delete("/delete-notification/:id",AdminAuth,deleteNotification)
+
 module.exports = router;
