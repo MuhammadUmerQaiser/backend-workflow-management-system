@@ -50,6 +50,10 @@ const {
   createDesk,
   getAllDesks
 } = require("../controllers/admin/DeskController");
+const {
+  createNotification,
+  getNotification
+} = require("../controllers/admin/NotificationController")
 const router = express.Router();
 
 router.post("/employee-signup", AdminAuth, EmployeeSignup);
@@ -141,4 +145,7 @@ router.get(
   getAllUserWorkflowHistory
 );
 
+// Notification
+router.post("/create-notification",AdminAuth,createNotification)
+router.get("/get-notification",AdminAuth,getNotification)
 module.exports = router;
