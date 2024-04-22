@@ -176,8 +176,14 @@ exports.deleteEmployee = async (req, res) => {
 
 exports.createTaxPayer = async (req, res) => {
   try {
-    const { name, category, sub_category } = req.body;
-    const taxPayer = new taxPayerModel({ name, category, sub_category });
+    const { name, category, sub_category, ntn } = req.body;
+    const taxPayer = new taxPayerModel({
+      name,
+      category,
+      sub_category,
+      ntn,
+      image: req.file.filename,
+    });
     await taxPayer.save();
 
     res.status(200).json({

@@ -3,6 +3,11 @@ const { ObjectId } = mongoose.Schema;
 const taxPayerSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
+    ntn: {
+      type: Number,
+      default: null,
+      unique: true,
+    },
     category: {
       type: ObjectId,
       ref: "category",
@@ -12,6 +17,10 @@ const taxPayerSchema = mongoose.Schema(
       type: ObjectId,
       ref: "sub-category",
       required: true,
+    },
+    image: {
+      type: String,
+      default: null,
     },
     occupied: {
       type: Number,
