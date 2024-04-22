@@ -5,6 +5,12 @@ const {
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
+  createTaxPayer,
+  updateTaxPayer,
+  getAllTaxPayers,
+  deleteTaxPayer,
+  getTaxPayersBasedOnMultipleCategoriesAndSubCategories,
+  getAllUnAssociatedEmployees,
 } = require("../controllers/admin/AdminController");
 const {
   createRole,
@@ -19,21 +25,32 @@ const {
   getAllDesignations,
   deleteDesignation,
   updateDesignation,
-  createTask,
-  getAllTasks,
-  deleteTask,
-  updateTask,
-  createGrade,
-  getAllGrades,
-  deleteGrade,
-  updateGrade,
-  createTeam,
-  getAllTeams,
-  deleteTeam,
-  updateTeam,
 } = require("../controllers/admin/GeneralController");
 const { AdminAuth } = require("../middleware/authentication");
-const { getAllUserWorkflowHistory } = require("../controllers/admin/WorkflowController");
+const {
+  getAllUserWorkflowHistory,
+} = require("../controllers/admin/WorkflowController");
+const {
+  createCategory,
+  getAllCategries,
+  deleteCategory,
+  updateCategory,
+  createSubCategory,
+  getAllSubCategries,
+  deleteSubCategory,
+  updateSubCategory,
+  getSubCategoriesBasedOnMultipleCategories,
+} = require("../controllers/admin/CategoryController");
+const {
+  createWorkingGroup,
+  getAllWorkingGroups,
+  getAllUnAssociatedWorkingGroups,
+} = require("../controllers/admin/WorkingGroupController");
+const {
+  createDesk,
+  getAllDesks,
+} = require("../controllers/admin/DeskController");
+const { uploadImage } = require("../helpers");
 const router = express.Router();
 
 router.post("/employee-signup", AdminAuth, EmployeeSignup);
@@ -60,25 +77,81 @@ router.get("/get-all-designations", AdminAuth, getAllDesignations);
 router.delete("/delete-designation/:id", AdminAuth, deleteDesignation);
 router.put("/update-designation/:id", AdminAuth, updateDesignation);
 
-//tasks
-router.post("/create-task", AdminAuth, createTask);
-router.get("/get-all-tasks", AdminAuth, getAllTasks);
-router.delete("/delete-task/:id", AdminAuth, deleteTask);
-router.put("/update-task/:id", AdminAuth, updateTask);
+// //tasks
+// router.post("/create-task", AdminAuth, createTask);
+// router.get("/get-all-tasks", AdminAuth, getAllTasks);
+// router.delete("/delete-task/:id", AdminAuth, deleteTask);
+// router.put("/update-task/:id", AdminAuth, updateTask);
 
-//grade
-router.post("/create-grade", AdminAuth, createGrade);
-router.get("/get-all-grades", AdminAuth, getAllGrades);
-router.delete("/delete-grade/:id", AdminAuth, deleteGrade);
-router.put("/update-grade/:id", AdminAuth, updateGrade);
+// //grade
+// router.post("/create-grade", AdminAuth, createGrade);
+// router.get("/get-all-grades", AdminAuth, getAllGrades);
+// router.delete("/delete-grade/:id", AdminAuth, deleteGrade);
+// router.put("/update-grade/:id", AdminAuth, updateGrade);
 
-//team
-router.post("/create-team", AdminAuth, createTeam);
-router.get("/get-all-teams", AdminAuth, getAllTeams);
-router.delete("/delete-team/:id", AdminAuth, deleteTeam);
-router.put("/update-team/:id", AdminAuth, updateTeam);
+// //team
+// router.post("/create-team", AdminAuth, createTeam);
+// router.get("/get-all-teams", AdminAuth, getAllTeams);
+// router.delete("/delete-team/:id", AdminAuth, deleteTeam);
+// router.put("/update-team/:id", AdminAuth, updateTeam);
 
+//category
+router.post("/create-category", AdminAuth, createCategory);
+router.get("/get-all-categories", AdminAuth, getAllCategries);
+router.delete("/delete-category/:id", AdminAuth, deleteCategory);
+router.put("/update-category/:id", AdminAuth, updateCategory);
 
-router.get("/get-all-user-workflow-history", AdminAuth, getAllUserWorkflowHistory);
+//sub-category
+router.post("/create-sub-category", AdminAuth, createSubCategory);
+router.get("/get-all-sub-categories", AdminAuth, getAllSubCategries);
+router.delete("/delete-sub-category/:id", AdminAuth, deleteSubCategory);
+router.put("/update-sub-category/:id", AdminAuth, updateSubCategory);
+
+router.get(
+  "/get-sub-categories-by-multiple-categories",
+  AdminAuth,
+  getSubCategoriesBasedOnMultipleCategories
+);
+
+//tax-payer
+router.post(
+  "/create-tax-payer",
+  AdminAuth,
+  uploadImage("image_uploaded"),
+  createTaxPayer
+);
+router.get("/get-all-tax-payers", AdminAuth, getAllTaxPayers);
+router.delete("/delete-tax-payer/:id", AdminAuth, deleteTaxPayer);
+router.put("/update-tax-payer/:id", AdminAuth, updateTaxPayer);
+
+router.get(
+  "/get-tax-payers-by-multiple-categories-&-sub-categories",
+  AdminAuth,
+  getTaxPayersBasedOnMultipleCategoriesAndSubCategories
+);
+
+//working-group
+router.post("/create-working-group", AdminAuth, createWorkingGroup);
+router.get("/get-all-working-groups", AdminAuth, getAllWorkingGroups);
+
+//desk
+router.post("/create-desk", AdminAuth, createDesk);
+router.get("/get-all-desks", AdminAuth, getAllDesks);
+
+router.get(
+  "/get-all-unassoicated-employees",
+  AdminAuth,
+  getAllUnAssociatedEmployees
+);
+router.get(
+  "/get-all-unassoicated-working-groups",
+  AdminAuth,
+  getAllUnAssociatedWorkingGroups
+);
+router.get(
+  "/get-all-user-workflow-history",
+  AdminAuth,
+  getAllUserWorkflowHistory
+);
 
 module.exports = router;

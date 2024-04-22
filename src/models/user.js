@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Schema;
 const userSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -17,35 +18,19 @@ const userSchema = mongoose.Schema(
     },
     domain: {
       type: String,
-      required: true,
+      default: null,
+      // required: true,
     },
     designation: {
       type: String,
-      required: true,
+      // required: true,
+      default: null,
     },
-    member: {
-      type: String,
-      required: true,
+    associated: {
+      type: ObjectId,
+      ref: "desk",
+      default: null,
     },
-    grade: {
-      type: String,
-      required: true,
-    },
-    team: {
-      type: String,
-    },
-    tasks: {
-      type: Array,
-      required: true,
-    },
-    // otp:{
-    //   type:String,
-    //   default : null
-    // },
-    // isVerified:{
-    //   type:Boolean,
-    //   default:false
-    // }
     isDeleted: {
       type: Boolean,
       default: false,

@@ -1,3 +1,17 @@
+const multer = require("multer");
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '..', '/assets/uploads'));
+  },
+  filename: function (req, file, cb) {
+    const fileName = Date.now() + '-' + file.originalname;
+    cb(null, fileName);
+  },
+});
+
+const upload = multer({ storage });
+
 exports.checkTargetDateIsNotFutureDate = (value) => {
   const currentDate = new Date();
   const targetDate = new Date(value);
@@ -21,4 +35,8 @@ exports.checkTargetTimeIsNotFutureTime = (value, date) => {
   } else {
     return false; //date future ki hai false krdo bina check kiye
   }
+};
+
+exports.uploadImage = (value) => {
+  return upload.single(value);
 };

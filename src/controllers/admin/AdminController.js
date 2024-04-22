@@ -1,5 +1,7 @@
 const express = require("express");
 const User = require("../../models/user");
+const taxPayerModel = require("../../models/tax-payer");
+const entityController = require("../../utils/entityController");
 const bcrypt = require("bcryptjs");
 var jwt = require("jsonwebtoken");
 
@@ -11,10 +13,10 @@ exports.EmployeeSignup = async (req, res) => {
     domain,
     designation,
     role,
-    member,
-    team,
-    grade,
-    tasks,
+    // member,
+    // team,
+    // grade,
+    // tasks,
   } = req.body;
   try {
     existingUser = await User.findOne({ email });
@@ -29,10 +31,10 @@ exports.EmployeeSignup = async (req, res) => {
       role: role,
       domain,
       designation,
-      member,
-      team,
-      grade,
-      tasks,
+      // member,
+      // team,
+      // grade,
+      // tasks,
       // otp: otp,
       // isVerified: false,
       isDeleted: false,
@@ -112,10 +114,10 @@ exports.updateEmployee = async (req, res) => {
       role,
       domain,
       designation,
-      member,
-      team,
-      grade,
-      tasks,
+      // member,
+      // team,
+      // grade,
+      // tasks,
     } = req.body;
 
     const existingUser = await User.findById(id);
@@ -136,10 +138,10 @@ exports.updateEmployee = async (req, res) => {
     existingUser.role = role || existingUser.role;
     existingUser.domain = domain || existingUser.domain;
     existingUser.designation = designation || existingUser.designation;
-    existingUser.member = member || existingUser.member;
-    existingUser.team = member == "group" ? team || existingUser.team : "";
-    existingUser.grade = grade || existingUser.grade;
-    existingUser.tasks = tasks || existingUser.tasks;
+    // existingUser.member = member || existingUser.member;
+    // existingUser.team = member == "group" ? team || existingUser.team : "";
+    // existingUser.grade = grade || existingUser.grade;
+    // existingUser.tasks = tasks || existingUser.tasks;
 
     const updatedUser = await existingUser.save();
 
@@ -169,5 +171,120 @@ exports.deleteEmployee = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred" });
+  }
+};
+
+exports.createTaxPayer = async (req, res) => {
+  try {
+    const { name, category, sub_category, ntn } = req.body;
+    const taxPayer = new taxPayerModel({
+      name,
+      category,
+      sub_category,
+      ntn,
+      image: req.file.filename,
+    });
+    await taxPayer.save();
+
+    res.status(200).json({
+      message: `Tax Payer created successfully`,
+      data: taxPayer,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getAllTaxPayers = async (req, res) => {
+  try {
+    await entityController.getAllEntities(
+      taxPayerModel,
+      false,
+      req,
+      res,
+      "category,sub_category"
+    );
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.deleteTaxPayer = async (req, res) => {
+  try {
+    await entityController.deleteEntity(taxPayerModel, "Tax Payer", req, res);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateTaxPayer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, category, sub_category } = req.body;
+
+    const existingTaxPayer = await taxPayerModel.findById(id);
+    if (!existingTaxPayer) {
+      return res
+        .status(404)
+        .json({ message: `Tax Payer with that id does not exist` });
+    }
+    existingTaxPayer.name = name || existingTaxPayer.name;
+    existingTaxPayer.category = category || existingTaxPayer.category;
+    existingTaxPayer.sub_category =
+      sub_category || existingTaxPayer.sub_category;
+    await existingTaxPayer.save();
+
+    res.status(200).json({
+      message: `Tax Payer updated successfully`,
+      data: existingTaxPayer,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getTaxPayersBasedOnMultipleCategoriesAndSubCategories = async (
+  req,
+  res
+) => {
+  try {
+    const { categories, subCategories } = req.query;
+    const categoryIds = categories.split(",");
+    const subCategoryIds = subCategories.split(",");
+    if (categories && subCategories) {
+      const taxPayers = await taxPayerModel
+        .find({
+          sub_category: { $in: subCategoryIds },
+          occupied: 0,
+        })
+        .populate("category")
+        .populate("sub_category");
+
+      res.status(200).json({
+        data: taxPayers,
+      });
+    } else {
+      res.status(200).json({
+        data: [],
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getAllUnAssociatedEmployees = async (req, res) => {
+  try {
+    const employees = await User.find({
+      associated: null,
+      role: { $ne: "Admin" },
+    });
+
+    res.status(200).json({
+      data: employees,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
