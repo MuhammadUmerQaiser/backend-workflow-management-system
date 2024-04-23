@@ -60,6 +60,7 @@ exports.getAllEmployees = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const paginatedData = req.query.paginatedData || false;
 
     const totalUsers = await User.countDocuments({
       role: { $ne: "Admin" },
@@ -67,14 +68,16 @@ exports.getAllEmployees = async (req, res) => {
 
     const totalPages = Math.ceil(totalUsers / limit);
 
-    const employees = await User.find({
+    let query = User.find({
       role: { $ne: "Admin" },
       _id: { $ne: req.userId },
       isDeleted: false,
-    })
-      .skip((page - 1) * limit)
-      .limit(limit);
+    });
 
+    if (paginatedData == "true") {
+      query = query.skip((page - 1) * limit).limit(limit);
+    }
+    const employees = await query.exec();
     res.status(200).json({
       data: employees,
       currentPage: page,

@@ -51,6 +51,12 @@ const {
   getAllDesks,
 } = require("../controllers/admin/DeskController");
 const { uploadImage } = require("../helpers");
+const {
+  createNotification,
+  getNotification,
+  getNotificationById,
+  deleteNotification,
+} = require("../controllers/admin/NotificationController");
 const router = express.Router();
 
 router.post("/employee-signup", AdminAuth, EmployeeSignup);
@@ -153,5 +159,11 @@ router.get(
   AdminAuth,
   getAllUserWorkflowHistory
 );
+
+// Notification
+router.post("/create-notification", AdminAuth, createNotification);
+router.get("/get-notifications", AdminAuth, getNotification);
+router.get("/get-notification/:id", AdminAuth, getNotificationById);
+router.delete("/delete-notification/:id", AdminAuth, deleteNotification);
 
 module.exports = router;
