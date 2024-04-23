@@ -3,7 +3,7 @@ const { ObjectId } = mongoose.Schema;
 
 const notificationSchema = mongoose.Schema(
   {
-    notificationNumber: { type: String, required: true, unique: true },
+    number: { type: String, required: true },
     date: { type: Date, default: Date.now },
     description: { type: String, required: true },
     information: [

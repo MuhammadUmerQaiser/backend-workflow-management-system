@@ -148,7 +148,7 @@ router.get(
 
 // Notification
 router.post("/create-notification",AdminAuth,createNotification)
-router.get("/get-notification",AdminAuth,getNotification)
+router.get("/get-notifications",AdminAuth,getNotification)
 router.get('/get-notification/:id',AdminAuth,getNotificationById)
 router.delete("/delete-notification/:id",AdminAuth,deleteNotification)
 

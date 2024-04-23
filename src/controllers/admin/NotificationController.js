@@ -2,9 +2,9 @@ const notificationModel = require("../../models/notification");
 
 exports.createNotification = async (req, res) => {
   try {
-    const { notificationNumber, date, description, information } = req.body;
+    const { number, date, description, information } = req.body;
     const notification = new notificationModel({
-      notificationNumber,
+      number,
       date,
       description,
       information,
@@ -16,15 +16,7 @@ exports.createNotification = async (req, res) => {
       data: notification,
     });
   } catch (error) {
-    if (
-      error.code === 11000 &&
-      error.keyPattern &&
-      error.keyPattern.notificationNumber
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Notification number must be unique." });
-    }
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -32,13 +24,24 @@ exports.createNotification = async (req, res) => {
 exports.getNotification = async (req, res) => {
   try {
     const { employeeId } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const paginatedData = req.query.paginatedData || false;
+
+    const totalEntities = await notificationModel.countDocuments();
+    const totalPages = Math.ceil(totalEntities / limit);
 
     const query = employeeId ? { "information.employeeId": employeeId } : {};
 
-    const notifications = await notificationModel.find(query);
+    const notifications = await notificationModel
+      .find(query)
+      .skip((page - 1) * limit)
+      .limit(limit);
 
     res.status(200).json({
-      message: "Notifications retrieved successfully",
+      currentPage: page,
+      totalPages: totalPages,
+      pageSize: limit,
       data: notifications,
     });
   } catch (error) {
@@ -84,4 +87,3 @@ exports.deleteNotification = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
