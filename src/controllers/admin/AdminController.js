@@ -4,6 +4,9 @@ const taxPayerModel = require("../../models/tax-payer");
 const entityController = require("../../utils/entityController");
 const bcrypt = require("bcryptjs");
 var jwt = require("jsonwebtoken");
+const xlsx = require("xlsx");
+const fs = require("fs");
+const path = require("path");
 
 exports.EmployeeSignup = async (req, res) => {
   const {
@@ -180,22 +183,50 @@ exports.deleteEmployee = async (req, res) => {
 exports.createTaxPayer = async (req, res) => {
   try {
     const { name, category, sub_category, ntn } = req.body;
-    const taxPayer = new taxPayerModel({
-      name,
-      category,
-      sub_category,
-      ntn,
-      image: req.file.filename,
-    });
-    await taxPayer.save();
+    // const workbook = xlsx.readFile(req.file.filename);
+    if (!req.file) {
+      saveTaxPayerInDatabase(name, category, sub_category, ntn);
+    } else {
+      // Read the Excel file
+      const workbook = xlsx.readFile(req.file.path);
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const data = xlsx.utils.sheet_to_json(sheet);
+      const keys = Object.keys(data[0]);
+      data.forEach((row) => {
+        saveTaxPayerInDatabase(row["NAME"], category, sub_category, row["NTN"]);
+      });
+      //delete the file which is uploaded in assets folder
+      const filePath = path.join(
+        __dirname,
+        "..",
+        "..",
+        `/assets/uploads/${req.file.filename}`
+      );
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.log("error====>", err);
+          return;
+        }
+      });
+    }
 
     res.status(200).json({
       message: `Tax Payer created successfully`,
-      data: taxPayer,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+const saveTaxPayerInDatabase = async (name, category, sub_category, ntn) => {
+  const taxPayer = new taxPayerModel({
+    name,
+    category,
+    sub_category,
+    ntn,
+  });
+  await taxPayer.save();
 };
 
 exports.getAllTaxPayers = async (req, res) => {
@@ -223,7 +254,7 @@ exports.deleteTaxPayer = async (req, res) => {
 exports.updateTaxPayer = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, category, sub_category } = req.body;
+    const { name, category, sub_category, ntn } = req.body;
 
     const existingTaxPayer = await taxPayerModel.findById(id);
     if (!existingTaxPayer) {
@@ -232,6 +263,7 @@ exports.updateTaxPayer = async (req, res) => {
         .json({ message: `Tax Payer with that id does not exist` });
     }
     existingTaxPayer.name = name || existingTaxPayer.name;
+    existingTaxPayer.ntn = ntn || existingTaxPayer.ntn;
     existingTaxPayer.category = category || existingTaxPayer.category;
     existingTaxPayer.sub_category =
       sub_category || existingTaxPayer.sub_category;

@@ -4,14 +4,14 @@ const deskSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
     slug: { type: String, required: true },
-    job_description: { type: String, required: true },
-    employee: [
-      {
-        type: ObjectId,
-        ref: "user",
-        required: true,
-      },
-    ],
+    // job_description: { type: String, required: true },
+    // employee: [
+    //   {
+    //     type: ObjectId,
+    //     ref: "user",
+    //     required: true,
+    //   },
+    // ],
     working_group: [
       {
         type: ObjectId,

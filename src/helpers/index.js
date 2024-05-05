@@ -1,16 +1,21 @@
 const multer = require("multer");
-const path = require('path');
+const path = require("path");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '..', '/assets/uploads'));
+    cb(null, path.join(__dirname, "..", "/assets/uploads"));
   },
   filename: function (req, file, cb) {
-    const fileName = Date.now() + '-' + file.originalname;
+    const fileName = file.originalname;
     cb(null, fileName);
   },
 });
 
 const upload = multer({ storage });
+
+exports.uploadImage = (value) => {
+  return upload.single(value);
+};
+
 
 exports.checkTargetDateIsNotFutureDate = (value) => {
   const currentDate = new Date();
@@ -37,6 +42,3 @@ exports.checkTargetTimeIsNotFutureTime = (value, date) => {
   }
 };
 
-exports.uploadImage = (value) => {
-  return upload.single(value);
-};

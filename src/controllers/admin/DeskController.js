@@ -4,25 +4,25 @@ const deskModel = require("../../models/desk");
 
 exports.createDesk = async (req, res) => {
   try {
-    const { name, employee, working_group, job_description } = req.body;
+    const { name, working_group } = req.body;
     const slug = name.toLowerCase().replace(/ /g, "-");
 
     const desk = new deskModel({
       name,
       slug,
-      employee,
+      // employee,
       working_group,
-      job_description,
+      // job_description,
     });
     await desk.save();
-    employee.forEach(async (user_id) => {
-      const employeeDetail = await userModel.findById(user_id);
-      console.log(employeeDetail);
-      if (employeeDetail) {
-        employeeDetail.associated = desk._id;
-        await employeeDetail.save();
-      }
-    });
+    // employee.forEach(async (user_id) => {
+    //   const employeeDetail = await userModel.findById(user_id);
+    //   console.log(employeeDetail);
+    //   if (employeeDetail) {
+    //     employeeDetail.associated = desk._id;
+    //     await employeeDetail.save();
+    //   }
+    // });
 
     working_group.forEach(async (group_id) => {
       const groupDetail = await workingGroupModel.findById(group_id);
@@ -52,7 +52,6 @@ exports.getAllDesks = async (req, res) => {
 
     const desks = await deskModel
       .find()
-      .populate("employee")
       .populate("working_group")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)

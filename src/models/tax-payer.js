@@ -18,10 +18,6 @@ const taxPayerSchema = mongoose.Schema(
       ref: "sub-category",
       required: true,
     },
-    image: {
-      type: String,
-      default: null,
-    },
     occupied: {
       type: Number,
       default: 0,
