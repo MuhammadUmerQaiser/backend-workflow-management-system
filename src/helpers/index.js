@@ -42,3 +42,9 @@ exports.checkTargetTimeIsNotFutureTime = (value, date) => {
   }
 };
 
+exports.checkTargetDateMustBeFutureDate = (value) => {
+  const currentDate = new Date();
+  const targetDate = new Date(value);
+  return targetDate > currentDate;
+};
+
