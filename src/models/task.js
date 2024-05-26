@@ -8,11 +8,11 @@ const taskSchema = mongoose.Schema(
     assigned_to: [
       {
         type: ObjectId,
-        ref: "users",
+        ref: "user",
         required: true,
       },
     ],
-    assigned_by: { type: ObjectId, ref: "users", required: true },
+    assigned_by: { type: ObjectId, ref: "user", required: true },
     due_date: { type: Date, required: true },
   },
   { timestamps: true }
