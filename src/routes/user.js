@@ -9,8 +9,9 @@ const { userAuth } = require("../middleware/authentication");
 const {
   createTask,
   getAllTasks,
-  getListOfAllMyTasks,
-  getTaskDetailById,
+  getListOfAllMyTaskAssignments,
+  getTaskAssignmentDetailById,
+  getListOfAllTaskAssignmentBaseOnTaskId
 } = require("../controllers/user/TaskController");
 
 router.post("/create-user-workflow", userAuth, createUserWorkflow);
@@ -18,7 +19,8 @@ router.get("/get-user-workflow-history", userAuth, getUserWorkflowHistory);
 
 router.post("/create-task", userAuth, createTask);
 router.get("/get-all-tasks", userAuth, getAllTasks);
-router.get("/get-my-tasks", userAuth, getListOfAllMyTasks);
-router.get("/get-task/:taskId", userAuth, getTaskDetailById);
+router.get("/get-my-tasks-assignments", userAuth, getListOfAllMyTaskAssignments);
+router.get("/get-task-assignment/:taskAssignmentId", userAuth, getTaskAssignmentDetailById);
+router.get("/get-task-assignment-by-task/:taskId", userAuth, getListOfAllTaskAssignmentBaseOnTaskId);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const { checkTargetDateMustBeFutureDate } = require("../../helpers");
 const taskModel = require("../../models/task");
+const taskAssignmentModel = require("../../models/task-assignment");
 
 exports.createTask = async (req, res) => {
   try {
@@ -12,11 +13,20 @@ exports.createTask = async (req, res) => {
     const task = new taskModel({
       name,
       description,
-      assigned_to,
+      // assigned_to,
       assigned_by,
       due_date,
     });
     await task.save();
+
+    assigned_to.forEach(async (assigneeId) => {
+      const assignment = new taskAssignmentModel({
+        task: task._id,
+        assigned_to: assigneeId,
+        assignment_reference: assigned_by,
+      });
+      await assignment.save();
+    });
 
     res.status(200).json({
       message: `Task created successfully`,
@@ -55,7 +65,7 @@ exports.getAllTasks = async (req, res) => {
   }
 };
 
-exports.getListOfAllMyTasks = async (req, res) => {
+exports.getListOfAllMyTaskAssignments = async (req, res) => {
   try {
     const userId = req.userId;
 
@@ -63,11 +73,15 @@ exports.getListOfAllMyTasks = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const paginatedData = req.query.paginatedData === "true";
 
-    const totalTasks = await taskModel.countDocuments({ assigned_to: userId });
+    const totalTasks = await taskAssignmentModel.countDocuments({
+      assigned_to: userId,
+    });
 
     const totalPages = Math.ceil(totalTasks / limit);
 
-    let query = taskModel.find({ assigned_to: userId });
+    let query = taskAssignmentModel
+      .find({ assigned_to: userId })
+      .populate("task");
 
     if (paginatedData) {
       query = query.skip((page - 1) * limit).limit(limit);
@@ -87,12 +101,29 @@ exports.getListOfAllMyTasks = async (req, res) => {
   }
 };
 
-exports.getTaskDetailById = async (req, res) => {
+exports.getTaskAssignmentDetailById = async (req, res) => {
   try {
-    const task = await taskModel
-      .findById(req.params.taskId)
+    const task = await taskAssignmentModel
+      .findById(req.params.taskAssignmentId)
       .populate("assigned_to", "-password")
-      .populate("assigned_by", "-password");
+      .populate("assignment_reference", "-password")
+      .populate("task");
+    res.status(200).json({
+      data: task,
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Error fetching task details", error });
+  }
+};
+
+exports.getListOfAllTaskAssignmentBaseOnTaskId = async (req, res) => {
+  try {
+    const task = await taskAssignmentModel
+      .find({ task: req.params.taskId })
+      .populate("assigned_to", "-password")
+      .populate("assignment_reference", "-password")
+      .populate("task");
     res.status(200).json({
       data: task,
     });
