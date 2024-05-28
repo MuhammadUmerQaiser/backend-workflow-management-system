@@ -1,6 +1,7 @@
 const { checkTargetDateMustBeFutureDate } = require("../../helpers");
 const taskModel = require("../../models/task");
 const taskAssignmentModel = require("../../models/task-assignment");
+const taskResponseModel = require("../../models/task-responses");
 
 exports.createTask = async (req, res) => {
   try {
@@ -130,5 +131,64 @@ exports.getListOfAllTaskAssignmentBaseOnTaskId = async (req, res) => {
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ message: "Error fetching task details", error });
+  }
+};
+
+exports.initiateAndContinueTheResponsOfSpecificTaskAssugnment = async (
+  req,
+  res
+) => {
+  try {
+    const { reciever, sender, response } = req.body;
+    const taskAssignmentId = req.params.taskAssignmentId;
+    const existingTaskResponse = taskResponseModel.find({
+      reciever: reciever,
+      sender: sender,
+      task_assignment: taskAssignmentId,
+    });
+
+    if (!existingTaskResponse) {
+      //yaha pr history create hojayegi
+    }
+
+    const taskResponse = new taskResponseModel({
+      reciever,
+      sender,
+      response,
+      task_assignment: taskAssignmentId,
+    });
+    await taskResponse.save();
+
+    res.status(200).json({
+      message: "Response sent successfully.",
+      data: taskResponse,
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Error fetching task details", error });
+  }
+};
+
+exports.getTheResponsesOfSameSenderAndReciever = async (req, res) => {
+  try {
+    const reciever = req.query.reciever;
+    const sender = req.query.sender;
+
+    const responseHistory = await taskResponseModel
+      .find({
+        $or: [
+          { reciever: reciever, sender: sender },
+          { reciever: sender, sender: reciever },
+        ],
+      })
+      .populate("reciever sender task_assignment")
+      .sort({ createdAt: 1 });
+
+    res.status(200).json({
+      data: responseHistory,
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Error fetching chat history", error });
   }
 };
