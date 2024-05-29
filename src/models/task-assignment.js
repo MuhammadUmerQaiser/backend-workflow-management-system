@@ -8,6 +8,14 @@ const taskAssignmentSchema = mongoose.Schema(
       ref: "user",
       required: true,
     },
+    transfer: [
+      {
+        assignee: { type: ObjectId, ref: "user", default: null },
+        assigned_by: { type: ObjectId, ref: "user", default: null },
+        is_task_response: { type: Boolean, default: true },
+        transferred_at: { type: Date, default: Date.now }
+      },
+    ],
     task: { type: ObjectId, ref: "task", required: true },
     assignment_reference: { type: ObjectId, ref: "user", default: null },
     is_task_response: { type: Boolean, default: true },

@@ -2,6 +2,7 @@ const { checkTargetDateMustBeFutureDate } = require("../../helpers");
 const taskModel = require("../../models/task");
 const taskAssignmentModel = require("../../models/task-assignment");
 const taskResponseModel = require("../../models/task-responses");
+const userModel = require("../../models/user");
 
 exports.createTask = async (req, res) => {
   try {
@@ -74,14 +75,22 @@ exports.getListOfAllMyTaskAssignments = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const paginatedData = req.query.paginatedData === "true";
 
+    // const totalTasks = await taskAssignmentModel.countDocuments({
+    //   assigned_to: userId,
+    // });
     const totalTasks = await taskAssignmentModel.countDocuments({
-      assigned_to: userId,
+      $or: [{ assigned_to: userId }, { "transfer.assignee": userId }],
     });
 
     const totalPages = Math.ceil(totalTasks / limit);
 
+    // let query = taskAssignmentModel
+    //   .find({ assigned_to: userId })
+    //   .populate("task");
     let query = taskAssignmentModel
-      .find({ assigned_to: userId })
+      .find({
+        $or: [{ assigned_to: userId }, { "transfer.assignee": userId }],
+      })
       .populate("task");
 
     if (paginatedData) {
@@ -108,7 +117,7 @@ exports.getTaskAssignmentDetailById = async (req, res) => {
       .findById(req.params.taskAssignmentId)
       .populate("assigned_to", "-password")
       .populate("assignment_reference", "-password")
-      .populate("task");
+      .populate("task transfer.assignee transfer.assigned_by");
     res.status(200).json({
       data: task,
     });
@@ -173,14 +182,29 @@ exports.getTheResponsesOfSameSenderAndReciever = async (req, res) => {
   try {
     const reciever = req.query.reciever;
     const sender = req.query.sender;
+    const taskAssignmentId = req.params.taskAssignmentId;
+
+    const taskAssignment = await taskAssignmentModel.findById(taskAssignmentId);
+    if (!taskAssignment) {
+      return res.status(404).json({ message: "Task assignment not found" });
+    }
+
+    // Find the latest transfer event for the current user
+    const latestTransfer = taskAssignment.transfer
+      .filter((transfer) => transfer.assigned_by.toString() === sender)
+      .sort((a, b) => b.transferred_at - a.transferred_at)[0];
+
+    const query = {
+      task_assignment: taskAssignmentId,
+    };
+
+    // Exclude messages after the latest transfer event
+    if (latestTransfer) {
+      query.createdAt = { $lt: latestTransfer.transferred_at };
+    }
 
     const responseHistory = await taskResponseModel
-      .find({
-        $or: [
-          { reciever: reciever, sender: sender },
-          { reciever: sender, sender: reciever },
-        ],
-      })
+      .find(query)
       .populate("reciever sender task_assignment")
       .sort({ createdAt: 1 });
 
@@ -190,5 +214,52 @@ exports.getTheResponsesOfSameSenderAndReciever = async (req, res) => {
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ message: "Error fetching chat history", error });
+  }
+};
+
+exports.transrerTaskAssignmentToAnotherEmployee = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { assigned_to } = req.body;
+    const taskAssignmentId = req.params.taskAssignmentId;
+
+    const assigneeUser = await userModel.findById(assigned_to);
+    const assignedByUser = await userModel.findById(userId);
+
+    const existingTaskAssignment = await taskAssignmentModel.findById(
+      taskAssignmentId
+    );
+    if (existingTaskAssignment) {
+      existingTaskAssignment.transfer.push({
+        assignee: assigned_to,
+        assigned_by: userId,
+        transferred_at: new Date(),
+      });
+      const transferResponse = existingTaskAssignment.transfer.find(
+        (item) => item.assignee === userId
+      );
+      if (transferResponse) {
+        transferResponse.is_task_response = false;
+      }
+
+      existingTaskAssignment.is_task_response = false;
+      await existingTaskAssignment.save();
+      const transferMessage = `Task transferred from ${assignedByUser.name} to ${assigneeUser.name}`;
+      const taskResponse = new taskResponseModel({
+        task_assignment: taskAssignmentId,
+        sender: userId,
+        reciever: assigned_to,
+        response: transferMessage,
+        type: "transfer",
+      });
+
+      await taskResponse.save();
+    }
+    res.status(200).json({
+      message: "Assignment transfered successfully.",
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Error", error });
   }
 };

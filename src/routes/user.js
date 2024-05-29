@@ -14,6 +14,7 @@ const {
   getListOfAllTaskAssignmentBaseOnTaskId,
   initiateAndContinueTheResponsOfSpecificTaskAssugnment,
   getTheResponsesOfSameSenderAndReciever,
+  transrerTaskAssignmentToAnotherEmployee,
 } = require("../controllers/user/TaskController");
 const { getUsersWithLowerRoles } = require("../controllers/GlobalController");
 
@@ -43,10 +44,15 @@ router.post(
   initiateAndContinueTheResponsOfSpecificTaskAssugnment
 );
 router.get(
-  "/get-response-history",
+  "/get-response-history/:taskAssignmentId",
   userAuth,
   getTheResponsesOfSameSenderAndReciever
 );
 router.get("/get-users-with-lower-roles", userAuth, getUsersWithLowerRoles);
+router.post(
+  "/transfer-task-assignment-to-another-employee/:taskAssignmentId",
+  userAuth,
+  transrerTaskAssignmentToAnotherEmployee
+);
 
 module.exports = router;

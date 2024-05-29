@@ -11,6 +11,11 @@ const taskResponseSchema = mongoose.Schema(
     task_assignment: { type: ObjectId, ref: "task-assignment", required: true },
     sender: { type: ObjectId, ref: "user", default: null },
     response: { type: String, required: true },
+    type: {
+      type: String,
+      enum: ["message", "transfer"],
+      default: "message",
+    },
   },
   { timestamps: true }
 );
