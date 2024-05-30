@@ -13,12 +13,21 @@ const taskAssignmentSchema = mongoose.Schema(
         assignee: { type: ObjectId, ref: "user", default: null },
         assigned_by: { type: ObjectId, ref: "user", default: null },
         is_task_response: { type: Boolean, default: true },
-        transferred_at: { type: Date, default: Date.now }
+        transferred_at: { type: Date, default: Date.now },
       },
     ],
     task: { type: ObjectId, ref: "task", required: true },
     assignment_reference: { type: ObjectId, ref: "user", default: null },
     is_task_response: { type: Boolean, default: true },
+    close_assignment_request: {
+      type: String,
+      enum: ["none", "pending", "accepted", "rejected"],
+      default: "none",
+    },
+    task_rejection_reason: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

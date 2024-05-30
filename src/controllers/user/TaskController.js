@@ -263,3 +263,27 @@ exports.transrerTaskAssignmentToAnotherEmployee = async (req, res) => {
     res.status(500).json({ message: "Error", error });
   }
 };
+
+exports.requestToCloseTheTaskAssignment = async (req, res) => {
+  try {
+    const taskAssignmentId = req.params.taskAssignmentId;
+    const existingTaskAssignment = await taskAssignmentModel.findById(
+      taskAssignmentId
+    );
+    if (existingTaskAssignment) {
+      existingTaskAssignment.close_assignment_request = "pending";
+      existingTaskAssignment.task_rejection_reason = null;
+      await existingTaskAssignment.save();
+    }
+    res.status(200).json({
+      message: "Close task request submitted successfully",
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Error", error });
+  }
+};
+
+exports.updateTheRequestStatusForTaskAssignment = (req, res) => {
+  
+}

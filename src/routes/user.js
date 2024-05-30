@@ -15,6 +15,8 @@ const {
   initiateAndContinueTheResponsOfSpecificTaskAssugnment,
   getTheResponsesOfSameSenderAndReciever,
   transrerTaskAssignmentToAnotherEmployee,
+  requestToCloseTheTaskAssignment,
+  updateTheRequestStatusForTaskAssignment
 } = require("../controllers/user/TaskController");
 const { getUsersWithLowerRoles } = require("../controllers/GlobalController");
 
@@ -53,6 +55,16 @@ router.post(
   "/transfer-task-assignment-to-another-employee/:taskAssignmentId",
   userAuth,
   transrerTaskAssignmentToAnotherEmployee
+);
+router.post(
+  "/close-task-assignment-request/:taskAssignmentId",
+  userAuth,
+  requestToCloseTheTaskAssignment
+);
+router.post(
+  "/update-the-request-status-for-close-task/:taskAssignmentId",
+  userAuth,
+  updateTheRequestStatusForTaskAssignment
 );
 
 module.exports = router;
