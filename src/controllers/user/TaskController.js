@@ -284,6 +284,29 @@ exports.requestToCloseTheTaskAssignment = async (req, res) => {
   }
 };
 
-exports.updateTheRequestStatusForTaskAssignment = (req, res) => {
-  
-}
+exports.updateTheRequestStatusForTaskAssignment = async (req, res) => {
+  try {
+    const taskAssignmentId = req.params.taskAssignmentId;
+    const { task_close_request_status, reason } = req.body;
+    const existingTaskAssignment = await taskAssignmentModel.findById(
+      taskAssignmentId
+    );
+    if (existingTaskAssignment) {
+      existingTaskAssignment.close_assignment_request =
+        task_close_request_status;
+      if (task_close_request_status == "rejected") {
+        existingTaskAssignment.task_rejection_reason = reason;
+      } else {
+        existingTaskAssignment.task_rejection_reason = null;
+      }
+
+      await existingTaskAssignment.save();
+    }
+    res.status(200).json({
+      message: `Task has been ${task_close_request_status}`,
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Error", error });
+  }
+};
