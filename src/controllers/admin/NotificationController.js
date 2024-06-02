@@ -87,3 +87,19 @@ exports.deleteNotification = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getDetailOfNotificationById = async (req, res) => {
+  try {
+    const notificationId = req.params.notificationId;
+    const notification = await notificationModel
+      .findById(notificationId)
+      .populate("information");
+
+    res.status(200).json({
+      data: notification,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

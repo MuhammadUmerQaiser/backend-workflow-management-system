@@ -310,3 +310,23 @@ exports.updateTheRequestStatusForTaskAssignment = async (req, res) => {
     res.status(500).json({ message: "Error", error });
   }
 };
+
+exports.getDetailOfTaskById = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    const task = await taskModel.findById(taskId).populate("assigned_by");
+
+    const taskAssignments = await taskAssignmentModel
+      .find({ task: task._id })
+      .populate(
+        "assigned_to transfer assignment_reference transfer.assignee transfer.assigned_by"
+      );
+
+    res.status(200).json({
+      data: { taskAssignments, task },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
