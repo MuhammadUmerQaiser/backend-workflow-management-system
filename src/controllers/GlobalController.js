@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const userModel = require("../models/user");
 const deskHistoryModel = require("../models/desk-history");
+const taskHistoryModel = require("../models/task-history");
 const { getRoleLevel } = require("../helpers");
 
 const roles = [
@@ -58,7 +59,7 @@ exports.getMyDeskHistory = async (req, res) => {
       .find({
         user: userId,
       })
-      .populate('user desk')
+      .populate("user desk")
       .skip((page - 1) * limit)
       .limit(limit);
 
@@ -67,6 +68,44 @@ exports.getMyDeskHistory = async (req, res) => {
       totalPages: totalPages,
       pageSize: limit,
       data: deskHistory,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+exports.getMyTaskkHistory = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const paginatedData = req.query.paginatedData || false;
+
+    const totalEntities = await taskHistoryModel.countDocuments({
+      user: userId,
+    });
+    const totalPages = Math.ceil(totalEntities / limit);
+
+    const taskHistory = await taskHistoryModel
+      .find({
+        user: userId,
+      })
+      .populate("user task_assignment")
+      .populate({
+        path: "task_assignment",
+        populate: {
+          path: "task",
+        },
+      })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.status(200).json({
+      currentPage: page,
+      totalPages: totalPages,
+      pageSize: limit,
+      data: taskHistory,
     });
   } catch (error) {
     console.error(error);

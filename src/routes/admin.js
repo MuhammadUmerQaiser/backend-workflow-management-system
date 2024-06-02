@@ -11,7 +11,8 @@ const {
   deleteTaxPayer,
   getTaxPayersBasedOnMultipleCategoriesAndSubCategories,
   getAllUnAssociatedEmployees,
-  getAllUserDeskHistory
+  getAllUserDeskHistory,
+  getAllUserTaskHistory
 } = require("../controllers/admin/AdminController");
 const {
   createRole,
@@ -177,6 +178,11 @@ router.get(
   "/get-all-user-desk-history",
   AdminAuth,
   getAllUserDeskHistory
+);
+router.get(
+  "/get-all-user-task-history",
+  AdminAuth,
+  getAllUserTaskHistory
 );
 
 module.exports = router;

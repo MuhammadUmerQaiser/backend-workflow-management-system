@@ -1,6 +1,7 @@
 const { checkTargetDateMustBeFutureDate } = require("../../helpers");
 const taskModel = require("../../models/task");
 const taskAssignmentModel = require("../../models/task-assignment");
+const taskHistoryModel = require("../../models/task-history");
 const taskResponseModel = require("../../models/task-responses");
 const userModel = require("../../models/user");
 
@@ -150,14 +151,20 @@ exports.initiateAndContinueTheResponsOfSpecificTaskAssugnment = async (
   try {
     const { reciever, sender, response } = req.body;
     const taskAssignmentId = req.params.taskAssignmentId;
-    const existingTaskResponse = taskResponseModel.find({
-      reciever: reciever,
-      sender: sender,
+    const existingTaskResponse = await taskResponseModel.findOne({
+      reciever,
+      sender,
       task_assignment: taskAssignmentId,
     });
-
-    if (!existingTaskResponse) {
-      //yaha pr history create hojayegi
+    console.log("existingTaskResponse==================", existingTaskResponse);
+    console.log("TASK ASSIGNMENT==================", taskAssignmentId);
+    const senderUser = await userModel.findById(sender);
+    if (!existingTaskResponse && senderUser.role != "Admin") {
+      const taskHistory = new taskHistoryModel({
+        user: sender,
+        task_assignment: taskAssignmentId,
+      });
+      await taskHistory.save();
     }
 
     const taskResponse = new taskResponseModel({
@@ -254,6 +261,17 @@ exports.transrerTaskAssignmentToAnotherEmployee = async (req, res) => {
       });
 
       await taskResponse.save();
+
+      const existingTaskHistory = await taskHistoryModel.findOne({
+        user: userId,
+        status: "In Progress",
+        removed: null,
+      });
+      if (existingTaskHistory) {
+        existingTaskHistory.status = "Transferred";
+        existingTaskHistory.removed = Date.now();
+        await existingTaskHistory.save();
+      }
     }
     res.status(200).json({
       message: "Assignment transfered successfully.",
@@ -266,6 +284,7 @@ exports.transrerTaskAssignmentToAnotherEmployee = async (req, res) => {
 
 exports.requestToCloseTheTaskAssignment = async (req, res) => {
   try {
+    const userId = req.userId;
     const taskAssignmentId = req.params.taskAssignmentId;
     const existingTaskAssignment = await taskAssignmentModel.findById(
       taskAssignmentId
@@ -273,6 +292,7 @@ exports.requestToCloseTheTaskAssignment = async (req, res) => {
     if (existingTaskAssignment) {
       existingTaskAssignment.close_assignment_request = "pending";
       existingTaskAssignment.task_rejection_reason = null;
+      existingTaskAssignment.close_request_generation = userId;
       await existingTaskAssignment.save();
     }
     res.status(200).json({
@@ -301,7 +321,21 @@ exports.updateTheRequestStatusForTaskAssignment = async (req, res) => {
       }
 
       await existingTaskAssignment.save();
+
+      const existingTaskHistory = await taskHistoryModel.findOne({
+        task_assignment: taskAssignmentId,
+        user: existingTaskAssignment.close_request_generation,
+        removed: null,
+      });
+      console.log('existingTaskHistory=====================', existingTaskHistory)
+      console.log('task_close_request_status=====================', task_close_request_status)
+      if (existingTaskHistory && task_close_request_status != "rejected") {
+        existingTaskHistory.status = "Completed";
+        existingTaskHistory.removed = Date.now();
+        await existingTaskHistory.save();
+      }
     }
+
     res.status(200).json({
       message: `Task has been ${task_close_request_status}`,
     });

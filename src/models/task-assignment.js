@@ -28,6 +28,7 @@ const taskAssignmentSchema = mongoose.Schema(
       type: String,
       default: null,
     },
+    close_request_generation: { type: ObjectId, ref: "user", default: null },
   },
   { timestamps: true }
 );

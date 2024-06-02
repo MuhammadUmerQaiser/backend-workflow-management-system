@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../../models/user");
 const taxPayerModel = require("../../models/tax-payer");
 const deskHistoryModel = require("../../models/desk-history");
+const taskHistoryModel = require("../../models/task-history");
 const entityController = require("../../utils/entityController");
 const bcrypt = require("bcryptjs");
 var jwt = require("jsonwebtoken");
@@ -336,7 +337,7 @@ exports.getAllUserDeskHistory = async (req, res) => {
 
     const deskHistory = await deskHistoryModel
       .find()
-      .populate('user desk')
+      .populate("user desk")
       .skip((page - 1) * limit)
       .limit(limit);
 
@@ -345,6 +346,39 @@ exports.getAllUserDeskHistory = async (req, res) => {
       totalPages: totalPages,
       pageSize: limit,
       data: deskHistory,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+exports.getAllUserTaskHistory = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const paginatedData = req.query.paginatedData || false;
+
+    const totalEntities = await taskHistoryModel.countDocuments();
+    const totalPages = Math.ceil(totalEntities / limit);
+
+    const taskHistory = await taskHistoryModel
+      .find()
+      .populate("user task_assignment")
+      .populate({
+        path: "task_assignment",
+        populate: {
+          path: "task",
+        },
+      })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.status(200).json({
+      currentPage: page,
+      totalPages: totalPages,
+      pageSize: limit,
+      data: taskHistory,
     });
   } catch (error) {
     console.error(error);

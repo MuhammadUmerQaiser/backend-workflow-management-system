@@ -21,6 +21,7 @@ const {
 const {
   getUsersWithLowerRoles,
   getMyDeskHistory,
+  getMyTaskkHistory,
 } = require("../controllers/GlobalController");
 
 router.post("/create-user-workflow", userAuth, createUserWorkflow);
@@ -69,10 +70,7 @@ router.post(
   userAuth,
   updateTheRequestStatusForTaskAssignment
 );
-router.get(
-  "/get-my-desk-history",
-  userAuth,
-  getMyDeskHistory
-);
+router.get("/get-my-desk-history", userAuth, getMyDeskHistory);
+router.get("/get-my-task-history", userAuth, getMyTaskkHistory);
 
 module.exports = router;
