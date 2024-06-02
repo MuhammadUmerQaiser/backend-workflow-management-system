@@ -1,8 +1,33 @@
 const notificationModel = require("../../models/notification");
+const userModel = require("../../models/user");
+const deskHistoryModel = require("../../models/desk-history");
 
 exports.createNotification = async (req, res) => {
   try {
     const { number, date, description, information } = req.body;
+
+    information.forEach(async (info) => {
+      const user = await userModel.findById(info.employeeId);
+      user.associated = info.deskId;
+      await user.save();
+
+      const checkUserExistingDeskHistory = await deskHistoryModel.findOne({
+        user: info.employeeId,
+        removed: null,
+      });
+
+      if (checkUserExistingDeskHistory) {
+        checkUserExistingDeskHistory.removed = Date.now();
+        await checkUserExistingDeskHistory.save();
+      }
+
+      const deskHistory = new deskHistoryModel({
+        user: info.employeeId,
+        desk: info.deskId,
+      });
+      await deskHistory.save();
+    });
+
     const notification = new notificationModel({
       number,
       date,
@@ -48,27 +73,7 @@ exports.getNotification = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-exports.getNotificationById = async (req, res) => {
-  try {
-    const { id } = req.params;
 
-    const notification = await notificationModel
-      .findById(id)
-      .populate("information.employeeId", "-password")
-      .populate("information.deskId");
-
-    if (!notification) {
-      return res.status(404).json({ message: "Notification not found" });
-    }
-
-    res.status(200).json({
-      message: "Notification retrieved successfully",
-      data: notification,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 exports.deleteNotification = async (req, res) => {
   try {
     const { id } = req.params;

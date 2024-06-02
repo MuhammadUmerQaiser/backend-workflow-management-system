@@ -1,6 +1,7 @@
 const express = require("express");
 const User = require("../../models/user");
 const taxPayerModel = require("../../models/tax-payer");
+const deskHistoryModel = require("../../models/desk-history");
 const entityController = require("../../utils/entityController");
 const bcrypt = require("bcryptjs");
 var jwt = require("jsonwebtoken");
@@ -317,6 +318,33 @@ exports.getAllUnAssociatedEmployees = async (req, res) => {
 
     res.status(200).json({
       data: employees,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+exports.getAllUserDeskHistory = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const paginatedData = req.query.paginatedData || false;
+
+    const totalEntities = await deskHistoryModel.countDocuments();
+    const totalPages = Math.ceil(totalEntities / limit);
+
+    const deskHistory = await deskHistoryModel
+      .find()
+      .populate('user desk')
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.status(200).json({
+      currentPage: page,
+      totalPages: totalPages,
+      pageSize: limit,
+      data: deskHistory,
     });
   } catch (error) {
     console.error(error);

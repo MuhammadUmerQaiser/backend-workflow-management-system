@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const userModel = require("../models/user");
+const deskHistoryModel = require("../models/desk-history");
 const { getRoleLevel } = require("../helpers");
 
 const roles = [
@@ -38,5 +39,37 @@ exports.getUsersWithLowerRoles = async (req, res) => {
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ message: "Error fetching chat history", error });
+  }
+};
+
+exports.getMyDeskHistory = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const paginatedData = req.query.paginatedData || false;
+
+    const totalEntities = await deskHistoryModel.countDocuments({
+      user: userId,
+    });
+    const totalPages = Math.ceil(totalEntities / limit);
+
+    const deskHistory = await deskHistoryModel
+      .find({
+        user: userId,
+      })
+      .populate('user desk')
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.status(200).json({
+      currentPage: page,
+      totalPages: totalPages,
+      pageSize: limit,
+      data: deskHistory,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };

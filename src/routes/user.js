@@ -18,7 +18,10 @@ const {
   requestToCloseTheTaskAssignment,
   updateTheRequestStatusForTaskAssignment,
 } = require("../controllers/user/TaskController");
-const { getUsersWithLowerRoles } = require("../controllers/GlobalController");
+const {
+  getUsersWithLowerRoles,
+  getMyDeskHistory,
+} = require("../controllers/GlobalController");
 
 router.post("/create-user-workflow", userAuth, createUserWorkflow);
 router.get("/get-user-workflow-history", userAuth, getUserWorkflowHistory);
@@ -65,6 +68,11 @@ router.post(
   "/update-the-request-status-for-close-task/:taskAssignmentId",
   userAuth,
   updateTheRequestStatusForTaskAssignment
+);
+router.get(
+  "/get-my-desk-history",
+  userAuth,
+  getMyDeskHistory
 );
 
 module.exports = router;

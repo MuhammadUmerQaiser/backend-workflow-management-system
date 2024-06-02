@@ -11,6 +11,7 @@ const {
   deleteTaxPayer,
   getTaxPayersBasedOnMultipleCategoriesAndSubCategories,
   getAllUnAssociatedEmployees,
+  getAllUserDeskHistory
 } = require("../controllers/admin/AdminController");
 const {
   createRole,
@@ -56,7 +57,6 @@ const { uploadImage } = require("../helpers");
 const {
   createNotification,
   getNotification,
-  getNotificationById,
   deleteNotification,
   getDetailOfNotificationById
 } = require("../controllers/admin/NotificationController");
@@ -169,10 +169,14 @@ router.get(
 // Notification
 router.post("/create-notification", AdminAuth, createNotification);
 router.get("/get-notifications", AdminAuth, getNotification);
-router.get("/get-notification/:id", AdminAuth, getNotificationById);
 router.delete("/delete-notification/:id", AdminAuth, deleteNotification);
 router.get("/get-notification/:notificationId", AdminAuth, getDetailOfNotificationById);
 
 router.get("/get-task/:taskId", AdminAuth, getDetailOfTaskById);
+router.get(
+  "/get-all-user-desk-history",
+  AdminAuth,
+  getAllUserDeskHistory
+);
 
 module.exports = router;

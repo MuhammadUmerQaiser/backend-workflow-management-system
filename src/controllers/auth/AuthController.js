@@ -38,6 +38,10 @@ exports.login = async (req, res) => {
         id: existingUser._id,
         // isVerified: existingUser.isVerified,
         role: existingUser.role,
+        name: existingUser.name,
+        email: existingUser.email,
+        domain: existingUser.domain,
+        designation: existingUser.designation,
       },
       token,
     });
@@ -49,11 +53,7 @@ exports.login = async (req, res) => {
   }
 };
 exports.AdminSignup = async (req, res) => {
-  const {
-    name,
-    email,
-    password,
-  } = req.body;
+  const { name, email, password } = req.body;
   try {
     existingUser = await User.findOne({ email });
     if (existingUser) {
