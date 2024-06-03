@@ -23,6 +23,7 @@ const {
   getMyDeskHistory,
   getMyTaskkHistory,
 } = require("../controllers/GlobalController");
+const { uploadImage } = require("../helpers");
 
 router.post("/create-user-workflow", userAuth, createUserWorkflow);
 router.get("/get-user-workflow-history", userAuth, getUserWorkflowHistory);
@@ -47,6 +48,7 @@ router.get(
 router.post(
   "/initate-the-response-of-task-assignment/:taskAssignmentId",
   userAuth,
+  uploadImage('file'),
   initiateAndContinueTheResponsOfSpecificTaskAssugnment
 );
 router.get(
