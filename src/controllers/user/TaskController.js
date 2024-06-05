@@ -57,8 +57,23 @@ exports.getAllTasks = async (req, res) => {
       query = query.skip((page - 1) * limit).limit(limit);
     }
     const tasks = await query.exec();
+
+    const tasksWithAssignments = await Promise.all(
+      tasks.map(async (task) => {
+        const assignments = await taskAssignmentModel
+          .find({ task: task._id })
+          .populate("assigned_to", "-password")
+          .populate("assignment_reference", "-password")
+          .exec();
+        return {
+          ...task.toObject(),
+          task_assignments: assignments,
+        };
+      })
+    );
+
     res.status(200).json({
-      data: tasks,
+      data: tasksWithAssignments,
       currentPage: page,
       totalPages: totalPages,
       pageSize: limit,
