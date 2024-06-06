@@ -1,12 +1,11 @@
-const authRoutes = require("./routes/auth");
-const userRoutes = require("./routes/user");
-const adminRoutes = require("./routes/admin");
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const connectToMongo = require("./db");
-const http = require("http");
-const socketIo = require("socket.io");
+const authRoutes = require("./routes/auth")
+const userRoutes = require("./routes/user")
+const adminRoutes = require("./routes/admin")
+const path = require('path');
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const connectToMongo=require("./db");
 
 connectToMongo();
 const app = express();
@@ -29,9 +28,10 @@ app.use(
 );
 
 app.use(bodyParser.json());
-app.use("/api", authRoutes);
-app.use("/api", adminRoutes);
-app.use("/api", userRoutes);
+app.use("/api",authRoutes)
+app.use("/api",adminRoutes)
+app.use("/api",userRoutes)
+app.use('/assets/uploads', express.static(path.join(__dirname, "/assets/uploads")));
 
 app.listen(port, () => {
   console.log(`Workflow backend listening on port ${port}`);

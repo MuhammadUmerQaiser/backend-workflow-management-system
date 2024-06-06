@@ -4,6 +4,7 @@ const taskAssignmentModel = require("../../models/task-assignment");
 const taskHistoryModel = require("../../models/task-history");
 const taskResponseModel = require("../../models/task-responses");
 const userModel = require("../../models/user");
+const config = require("../../config");
 
 exports.createTask = async (req, res) => {
   try {
@@ -56,8 +57,23 @@ exports.getAllTasks = async (req, res) => {
       query = query.skip((page - 1) * limit).limit(limit);
     }
     const tasks = await query.exec();
+
+    const tasksWithAssignments = await Promise.all(
+      tasks.map(async (task) => {
+        const assignments = await taskAssignmentModel
+          .find({ task: task._id })
+          .populate("assigned_to", "-password")
+          .populate("assignment_reference", "-password")
+          .exec();
+        return {
+          ...task.toObject(),
+          task_assignments: assignments,
+        };
+      })
+    );
+
     res.status(200).json({
-      data: tasks,
+      data: tasksWithAssignments,
       currentPage: page,
       totalPages: totalPages,
       pageSize: limit,
@@ -151,6 +167,8 @@ exports.initiateAndContinueTheResponsOfSpecificTaskAssugnment = async (
   try {
     const { reciever, sender, response } = req.body;
     const taskAssignmentId = req.params.taskAssignmentId;
+    const file = req.file ? req.file.filename : null;
+
     const existingTaskResponse = await taskResponseModel.findOne({
       reciever,
       sender,
@@ -172,6 +190,7 @@ exports.initiateAndContinueTheResponsOfSpecificTaskAssugnment = async (
       sender,
       response,
       task_assignment: taskAssignmentId,
+      file,
     });
     await taskResponse.save();
 
@@ -215,8 +234,16 @@ exports.getTheResponsesOfSameSenderAndReciever = async (req, res) => {
       .populate("reciever sender task_assignment")
       .sort({ createdAt: 1 });
 
+    const responseHistoryWithFileURL = responseHistory.map((response) => {
+      if (response.file) {
+        response = response.toObject();
+        response.file_url = `${config.BASE_URL}${response.file}`;
+      }
+      return response;
+    });
+
     res.status(200).json({
-      data: responseHistory,
+      data: responseHistoryWithFileURL,
     });
   } catch (error) {
     console.log("error", error);
@@ -327,8 +354,14 @@ exports.updateTheRequestStatusForTaskAssignment = async (req, res) => {
         user: existingTaskAssignment.close_request_generation,
         removed: null,
       });
-      console.log('existingTaskHistory=====================', existingTaskHistory)
-      console.log('task_close_request_status=====================', task_close_request_status)
+      console.log(
+        "existingTaskHistory=====================",
+        existingTaskHistory
+      );
+      console.log(
+        "task_close_request_status=====================",
+        task_close_request_status
+      );
       if (existingTaskHistory && task_close_request_status != "rejected") {
         existingTaskHistory.status = "Completed";
         existingTaskHistory.removed = Date.now();
