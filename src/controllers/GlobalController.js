@@ -112,3 +112,22 @@ exports.getMyTaskkHistory = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+exports.saveUserWebTokenForPushNotification = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { token } = req.body;
+    const user = await userModel.findById(userId);
+
+    if (user) {
+      user.token = token;
+      user.save();
+    }
+    res.status(200).json({
+      message: "Token saved",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

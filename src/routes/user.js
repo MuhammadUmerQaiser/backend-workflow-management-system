@@ -22,6 +22,7 @@ const {
   getUsersWithLowerRoles,
   getMyDeskHistory,
   getMyTaskkHistory,
+  saveUserWebTokenForPushNotification,
 } = require("../controllers/GlobalController");
 const { uploadImage } = require("../helpers");
 
@@ -48,7 +49,7 @@ router.get(
 router.post(
   "/initate-the-response-of-task-assignment/:taskAssignmentId",
   userAuth,
-  uploadImage('file'),
+  uploadImage("file"),
   initiateAndContinueTheResponsOfSpecificTaskAssugnment
 );
 router.get(
@@ -74,5 +75,11 @@ router.post(
 );
 router.get("/get-my-desk-history", userAuth, getMyDeskHistory);
 router.get("/get-my-task-history", userAuth, getMyTaskkHistory);
+
+router.post(
+  "/save-user-web-token-for-notification",
+  userAuth,
+  saveUserWebTokenForPushNotification
+);
 
 module.exports = router;

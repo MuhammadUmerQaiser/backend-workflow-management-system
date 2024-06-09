@@ -5,6 +5,7 @@ const taskHistoryModel = require("../../models/task-history");
 const taskResponseModel = require("../../models/task-responses");
 const userModel = require("../../models/user");
 const config = require("../../config");
+const admin = require("../../firebaseAdmin");
 
 exports.createTask = async (req, res) => {
   try {
@@ -174,9 +175,10 @@ exports.initiateAndContinueTheResponsOfSpecificTaskAssugnment = async (
       sender,
       task_assignment: taskAssignmentId,
     });
-    console.log("existingTaskResponse==================", existingTaskResponse);
-    console.log("TASK ASSIGNMENT==================", taskAssignmentId);
+
     const senderUser = await userModel.findById(sender);
+    const recieverUser = await userModel.findById(reciever);
+
     if (!existingTaskResponse && senderUser.role != "Admin") {
       const taskHistory = new taskHistoryModel({
         user: sender,
@@ -193,6 +195,19 @@ exports.initiateAndContinueTheResponsOfSpecificTaskAssugnment = async (
       file,
     });
     await taskResponse.save();
+
+    if (recieverUser && recieverUser.token) {
+      const message = {
+        notification: {
+          title: `Task Response From ${senderUser.name}`,
+          body: response,
+        },
+        token: recieverUser.token,
+      };
+
+      const noti = await admin.messaging().send(message);
+      console.log("Successfully sent message:", noti);
+    }
 
     res.status(200).json({
       message: "Response sent successfully.",
