@@ -23,6 +23,7 @@ const {
   getMyDeskHistory,
   getMyTaskkHistory,
   saveUserWebTokenForPushNotification,
+  getTheListOfTaxPayerAssociatedWithEmployee,
 } = require("../controllers/GlobalController");
 const { uploadImage } = require("../helpers");
 
@@ -80,6 +81,12 @@ router.post(
   "/save-user-web-token-for-notification",
   userAuth,
   saveUserWebTokenForPushNotification
+);
+
+router.get(
+  "/get-user-associated-tax-payer",
+  userAuth,
+  getTheListOfTaxPayerAssociatedWithEmployee
 );
 
 module.exports = router;

@@ -131,3 +131,44 @@ exports.saveUserWebTokenForPushNotification = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+exports.getTheListOfTaxPayerAssociatedWithEmployee = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await userModel.findById(userId).populate({
+      path: "associated",
+      populate: {
+        path: "working_group",
+        populate: {
+          path: "tax_payer",
+          populate: {
+            path: 'category sub_category'
+          }
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let taxPayers = [];
+
+    if (user.associated && user.associated.working_group) {
+      taxPayers = user.associated.working_group.reduce((acc, group) => {
+        if (group.tax_payer) {
+          acc.push(...group.tax_payer);
+        }
+        return acc;
+      }, []);
+    }
+
+    res.status(200).json({
+      data: taxPayers,
+      user: user,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

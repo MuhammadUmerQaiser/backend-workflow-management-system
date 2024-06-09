@@ -31,7 +31,7 @@ exports.login = async (req, res) => {
         role: existingUser.role,
       },
       "harisisagoodboy",
-      { expiresIn: "10h" }
+      { expiresIn: "100y" }
     );
     res.status(200).json({
       result: {
