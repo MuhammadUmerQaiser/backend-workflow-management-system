@@ -26,6 +26,11 @@ const userSchema = mongoose.Schema(
       // required: true,
       default: null,
     },
+    token: {
+      type: String,
+      // required: true,
+      default: null,
+    },
     associated: {
       type: ObjectId,
       ref: "desk",

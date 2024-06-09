@@ -68,3 +68,19 @@ exports.getAllDesks = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+exports.getDetailOfDeskById = async (req, res) => {
+  try {
+    const deskId = req.params.deskId;
+    const desk = await deskModel
+      .findById(deskId)
+      .populate("working_group");
+
+    res.status(200).json({
+      data: desk,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

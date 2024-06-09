@@ -11,6 +11,8 @@ const {
   deleteTaxPayer,
   getTaxPayersBasedOnMultipleCategoriesAndSubCategories,
   getAllUnAssociatedEmployees,
+  getAllUserDeskHistory,
+  getAllUserTaskHistory
 } = require("../controllers/admin/AdminController");
 const {
   createRole,
@@ -45,18 +47,21 @@ const {
   createWorkingGroup,
   getAllWorkingGroups,
   getAllUnAssociatedWorkingGroups,
+  getDetailOfWorkingGroupById
 } = require("../controllers/admin/WorkingGroupController");
 const {
   createDesk,
   getAllDesks,
+  getDetailOfDeskById
 } = require("../controllers/admin/DeskController");
 const { uploadImage } = require("../helpers");
 const {
   createNotification,
   getNotification,
-  getNotificationById,
   deleteNotification,
+  getDetailOfNotificationById
 } = require("../controllers/admin/NotificationController");
+const { getDetailOfTaskById } = require("../controllers/user/TaskController");
 const router = express.Router();
 
 router.post("/employee-signup", AdminAuth, EmployeeSignup);
@@ -139,10 +144,12 @@ router.get(
 //working-group
 router.post("/create-working-group", AdminAuth, createWorkingGroup);
 router.get("/get-all-working-groups", AdminAuth, getAllWorkingGroups);
+router.get("/get-working-group/:workingGroupId", AdminAuth, getDetailOfWorkingGroupById);
 
 //desk
 router.post("/create-desk", AdminAuth, createDesk);
 router.get("/get-all-desks", AdminAuth, getAllDesks);
+router.get("/get-desk/:deskId", AdminAuth, getDetailOfDeskById);
 
 router.get(
   "/get-all-unassoicated-employees",
@@ -163,7 +170,19 @@ router.get(
 // Notification
 router.post("/create-notification", AdminAuth, createNotification);
 router.get("/get-notifications", AdminAuth, getNotification);
-router.get("/get-notification/:id", AdminAuth, getNotificationById);
 router.delete("/delete-notification/:id", AdminAuth, deleteNotification);
+router.get("/get-notification/:notificationId", AdminAuth, getDetailOfNotificationById);
+
+router.get("/get-task/:taskId", AdminAuth, getDetailOfTaskById);
+router.get(
+  "/get-all-user-desk-history",
+  AdminAuth,
+  getAllUserDeskHistory
+);
+router.get(
+  "/get-all-user-task-history",
+  AdminAuth,
+  getAllUserTaskHistory
+);
 
 module.exports = router;

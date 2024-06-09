@@ -6,9 +6,21 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const fileName = file.originalname;
-    cb(null, fileName);
+    // cb(null, fileName);
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
+
+const roles = [
+  { name: "Chariman", level: 1 },
+  { name: "Senior Member", level: 2 },
+  { name: "Member", level: 3 },
+  { name: "Commissioner", level: 4 },
+  { name: "Deputy Commissioner", level: 5 },
+  { name: "Assistant Commissioner", level: 6 },
+  { name: "SSTO", level: 7 },
+];
+
 
 const upload = multer({ storage });
 
@@ -40,5 +52,16 @@ exports.checkTargetTimeIsNotFutureTime = (value, date) => {
   } else {
     return false; //date future ki hai false krdo bina check kiye
   }
+};
+
+exports.checkTargetDateMustBeFutureDate = (value) => {
+  const currentDate = new Date();
+  const targetDate = new Date(value);
+  return targetDate > currentDate;
+};
+
+exports.getRoleLevel = (roleName) => {
+  const role = roles.find(role => role.name === roleName);
+  return role ? role.level : null;
 };
 

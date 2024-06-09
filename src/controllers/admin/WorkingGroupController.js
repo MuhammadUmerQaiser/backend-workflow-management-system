@@ -76,3 +76,19 @@ exports.getAllUnAssociatedWorkingGroups = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+exports.getDetailOfWorkingGroupById = async (req, res) => {
+  try {
+    const workingGroupId = req.params.workingGroupId;
+    const groups = await workingGroupModel
+      .findById(workingGroupId)
+      .populate("category sub_category tax_payer associated");
+
+    res.status(200).json({
+      data: groups,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
