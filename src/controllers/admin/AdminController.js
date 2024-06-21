@@ -9,15 +9,15 @@ var jwt = require("jsonwebtoken");
 const xlsx = require("xlsx");
 const fs = require("fs");
 const path = require("path");
-
+const sendEmail = require("../../utils/sendEmail");
 exports.EmployeeSignup = async (req, res) => {
   const {
     name,
     email,
     password,
-    domain,
-    designation,
-    role,
+    // domain,
+    // designation,
+    // role,
     // member,
     // team,
     // grade,
@@ -33,16 +33,16 @@ exports.EmployeeSignup = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: role,
-      domain,
-      designation,
+      // role: "Employee",
+      // domain,
+      // designation,
       // member,
       // team,
       // grade,
       // tasks,
       // otp: otp,
       // isVerified: false,
-      isDeleted: false,
+      // isDeleted: false,
     });
     const authtoken = jwt.sign(
       { email: result.email, id: result._id },
@@ -51,6 +51,8 @@ exports.EmployeeSignup = async (req, res) => {
         expiresIn: "10h",
       }
     );
+    sendEmail(email, password);
+
     res.status(200).json({
       data: result,
       authtoken,
@@ -61,33 +63,52 @@ exports.EmployeeSignup = async (req, res) => {
   }
 };
 
+// exports.getAllEmployees = async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 10;
+//     const paginatedData = req.query.paginatedData || false;
+
+//     const totalUsers = await User.countDocuments({
+//       role: { $ne: "Admin" },
+//     });
+
+//     const totalPages = Math.ceil(totalUsers / limit);
+
+//     let query = User.find({
+//       role: { $ne: "Admin" },
+//       _id: { $ne: req.userId },
+//       isDeleted: false,
+//     });
+
+//     if (paginatedData == "true") {
+//       query = query.skip((page - 1) * limit).limit(limit);
+//     }
+//     const employees = await query.exec();
+//     console.log("employees",employees)
+//     res.status(200).json({
+//       data: employees,
+//       currentPage: page,
+//       totalPages: totalPages,
+//       pageSize: limit,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+
 exports.getAllEmployees = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const paginatedData = req.query.paginatedData || false;
+    // Find users with role "Employee" and not deleted
+    const employees = await User.find();
 
-    const totalUsers = await User.countDocuments({
-      role: { $ne: "Admin" },
-    });
+    // Log the fetched employees
+    console.log("employees", employees);
 
-    const totalPages = Math.ceil(totalUsers / limit);
-
-    let query = User.find({
-      role: { $ne: "Admin" },
-      _id: { $ne: req.userId },
-      isDeleted: false,
-    });
-
-    if (paginatedData == "true") {
-      query = query.skip((page - 1) * limit).limit(limit);
-    }
-    const employees = await query.exec();
+    // Send the response with the retrieved data
     res.status(200).json({
       data: employees,
-      currentPage: page,
-      totalPages: totalPages,
-      pageSize: limit,
     });
   } catch (error) {
     console.error(error);

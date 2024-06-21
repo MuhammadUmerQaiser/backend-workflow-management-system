@@ -3,13 +3,13 @@ require("dotenv").config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const sendEmail = (receiver, otp) => {
+const sendEmail = (receiver,password) => {
   const msg = {
     to: receiver,
     from: "muhammadhariskuk123@gmail.com",
-    subject: "Your One Time password is:",
-    text: `Your OTP is: ${otp}`,
-    html: `<p>Your One Time password is: <strong>${otp}</strong></p>`,
+    subject: "Your credentials are:",
+    text: `Your password against the email ${receiver} is: ${password}`,
+    html: `<p>Your  password is: <strong>${password}</strong></p>`,
   };
   sgMail
     .send(msg)
