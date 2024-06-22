@@ -98,7 +98,8 @@ exports.getDetailOfNotificationById = async (req, res) => {
     const notificationId = req.params.notificationId;
     const notification = await notificationModel
       .findById(notificationId)
-      .populate("information");
+      .populate("information.employeeId")
+      .populate("information.deskId");
 
     res.status(200).json({
       data: notification,
